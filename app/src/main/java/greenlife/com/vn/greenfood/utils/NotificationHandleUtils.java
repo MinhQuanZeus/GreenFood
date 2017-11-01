@@ -31,7 +31,7 @@ import java.util.List;
 import greenlife.com.vn.greenfood.R;
 
 /**
- * Created by anhlt on 1/11/2017.
+ * Created by thean on 11/1/2017.
  */
 
 public class NotificationHandleUtils {
@@ -194,4 +194,3 @@ public class NotificationHandleUtils {
         return 0;
     }
 }
-

@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import greenlife.com.vn.greenfood.R;
 import greenlife.com.vn.greenfood.fragments.NewFeedFragment;
+import greenlife.com.vn.greenfood.fragments.NotificationFragment;
 import greenlife.com.vn.greenfood.managers.ScreenManager;
 import greenlife.com.vn.greenfood.utils.BottomNavigationViewHelper;
 
@@ -38,9 +39,9 @@ public class MainActivity extends AppCompatActivity {
 //                case R.id.navigation_fab:
 //                    //   mTextMessage.setText(R.string.title_notifications);
 //                    return true;
-//                case R.id.navigation_notifications:
-//                    ScreenManager.openFragment(getSupportFragmentManager(),new NotificationFragment(),R.id.content,false);
-//                    return true;
+                case R.id.navigation_notifications:
+                    ScreenManager.openFragment(getSupportFragmentManager(),new NotificationFragment(),R.id.content,false);
+                    return true;
 //                case R.id.navigation_profile:
 //                    ScreenManager.openFragment(getSupportFragmentManager(),new MeFragment(),R.id.content,false);
 //                    return true;
