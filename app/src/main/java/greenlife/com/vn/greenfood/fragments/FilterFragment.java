@@ -94,7 +94,7 @@ public class FilterFragment extends AAH_FabulousFragment {
         });
 
         mAdapter = new SectionsPagerAdapter();
-        vp_types.setOffscreenPageLimit(4);
+        vp_types.setOffscreenPageLimit(2);
         vp_types.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
         tabs_types.setupWithViewPager(vp_types);
@@ -123,16 +123,10 @@ public class FilterFragment extends AAH_FabulousFragment {
 //            ll_scroll.setLayoutParams(lp);
             switch (position) {
                 case 0:
-                    inflateLayoutWithFilters("price", fbl);
-                    break;
-                case 1:
                     inflateLayoutWithFilters("rating", fbl);
                     break;
-                case 2:
+                case 1:
                     inflateLayoutWithFilters("time", fbl);
-                    break;
-                case 3:
-                    inflateLayoutWithFilters("sort", fbl);
                     break;
             }
             collection.addView(layout);
@@ -147,20 +141,16 @@ public class FilterFragment extends AAH_FabulousFragment {
 
         @Override
         public int getCount() {
-            return 4;
+            return 2;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Giá";
-                case 1:
                     return "Đánh giá";
-                case 2:
+                case 1:
                     return "Thời gian";
-                case 3:
-                    return "Sắp xếp";
             }
             return "";
         }
@@ -175,97 +165,13 @@ public class FilterFragment extends AAH_FabulousFragment {
     private void inflateLayoutWithFilters(final String filter_category, FlexboxLayout fbl) {
         List<String> keys = new ArrayList<>();
         switch (filter_category) {
-            case "price":
-                keys = getUniquePriceKeys();
-                break;
             case "rating":
                 keys = getUniqueRatingKeys();
                 break;
             case "time":
                 keys = getUniqueTimeKeys();
                 break;
-            case "sort":
-                keys = getUniqueSortKeys();
-                break;
         }
-        if (!filter_category.equals("sort")) {
-            for (int i = 0; i < keys.size(); i++) {
-                View subchild = getActivity().getLayoutInflater().inflate(R.layout.single_chip, null);
-                final TextView tv = ((TextView) subchild.findViewById(R.id.txt_title));
-                tv.setText(keys.get(i));
-                final int finalI = i;
-                final List<String> finalKeys = keys;
-                tv.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (tv.getTag() != null && tv.getTag().equals("selected")) {
-                            tv.setTag("unselected");
-                            tv.setBackgroundResource(R.drawable.chip_unselected);
-                            tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_chips));
-                            removeFromSelectedMap(filter_category, finalKeys.get(finalI));
-                        } else {
-                            tv.setTag("selected");
-                            tv.setBackgroundResource(R.drawable.chip_selected);
-                            tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_header));
-                            addToSelectedMap(filter_category, finalKeys.get(finalI));
-                        }
-                    }
-                });
-                if (applied_filters != null && applied_filters.get(filter_category) != null && applied_filters.get(filter_category).contains(keys.get(finalI))) {
-                    tv.setTag("selected");
-                    tv.setBackgroundResource(R.drawable.chip_selected);
-                    tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_header));
-                } else {
-                    tv.setBackgroundResource(R.drawable.chip_unselected);
-                    tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_chips));
-                }
-                textviews.add(tv);
-
-                fbl.addView(subchild);
-            }
-        }else{
-            for (int i = 0; i < keys.size(); i++) {
-                View subchild = getActivity().getLayoutInflater().inflate(R.layout.single_chip, null);
-                final TextView tv = ((TextView) subchild.findViewById(R.id.txt_title));
-                tv.setText(keys.get(i));
-                final int finalI = i;
-                final List<String> finalKeys = keys;
-                tv.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        for(int j=0;j<finalKeys.size();j++){
-                            tv.setTag("unselected");
-                            tv.setBackgroundResource(R.drawable.chip_unselected);
-                            tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_chips));
-                            removeFromSelectedMap(filter_category, finalKeys.get(j));
-                        }
-                        if (tv.getTag() != null && tv.getTag().equals("selected")) {
-                            tv.setTag("unselected");
-                            tv.setBackgroundResource(R.drawable.chip_unselected);
-                            tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_chips));
-                            removeFromSelectedMap(filter_category, finalKeys.get(finalI));
-                        } else {
-                            tv.setTag("selected");
-                            tv.setBackgroundResource(R.drawable.chip_selected);
-                            tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_header));
-                            addToSelectedMap(filter_category, finalKeys.get(finalI));
-                        }
-                    }
-                });
-                if (applied_filters != null && applied_filters.get(filter_category) != null && applied_filters.get(filter_category).contains(keys.get(finalI))) {
-                    tv.setTag("selected");
-                    tv.setBackgroundResource(R.drawable.chip_selected);
-                    tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_header));
-                } else {
-                    tv.setBackgroundResource(R.drawable.chip_unselected);
-                    tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_chips));
-                }
-                textviews.add(tv);
-
-                fbl.addView(subchild);
-            }
-        }
-
 
     }
 
@@ -289,44 +195,24 @@ public class FilterFragment extends AAH_FabulousFragment {
         }
     }
 
-    public List<String> getUniquePriceKeys() {
-        List<String> price = new ArrayList<>();
-        price.add("Miễn phí");
-        price.add("0 - 100.000₫");
-        price.add("100.000 - 200.000₫");
-        price.add("200.000 - 500.000₫");
-        price.add(">500.000₫");
-        Collections.sort(price);
-        return price;
-    }
 
     public List<String> getUniqueRatingKeys() {
         List<String> rating = new ArrayList<>();
-        rating.add("> 0");
-        rating.add("> 1");
-        rating.add("> 2");
-        rating.add("> 3");
-        rating.add("> 4");
+        rating.add(">= 0");
+        rating.add(">= 1");
+        rating.add(">= 2");
+        rating.add(">= 3");
+        rating.add(">= 4");
         Collections.sort(rating);
         return rating;
     }
 
     public List<String> getUniqueTimeKeys() {
         List<String> rating = new ArrayList<>();
-        rating.add("< 1h");
-        rating.add("< 3h");
-        rating.add("> 5h");
-        rating.add("< 7h");
-        rating.add("< 24h");
-        Collections.sort(rating);
-        return rating;
-    }
-
-    public List<String> getUniqueSortKeys() {
-        List<String> rating = new ArrayList<>();
-        rating.add("Theo thời gian");
-        rating.add("Theo giá tăng dần");
-        rating.add("Theo giá giảm dần");
+        rating.add("<= 01h");
+        rating.add("<= 03h");
+        rating.add("<= 12h");
+        rating.add("<= 24h");
         Collections.sort(rating);
         return rating;
     }

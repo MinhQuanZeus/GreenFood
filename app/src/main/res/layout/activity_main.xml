@@ -34,8 +34,4 @@
         app:layout_anchorGravity="bottom|end"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
-
-
-
-
 </RelativeLayout>
