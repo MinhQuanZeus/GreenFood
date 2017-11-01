@@ -1,6 +1,7 @@
 package greenlife.com.vn.greenfood.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -26,6 +27,7 @@ import com.squareup.picasso.Picasso;
 import java.util.Timer;
 
 import greenlife.com.vn.greenfood.R;
+import greenlife.com.vn.greenfood.activities.FoodDetailActivity;
 import greenlife.com.vn.greenfood.models.Post;
 import greenlife.com.vn.greenfood.models.User;
 import greenlife.com.vn.greenfood.network.RetrofitFactory;
@@ -40,9 +42,6 @@ import retrofit2.Response;
 
 import static android.content.ContentValues.TAG;
 
-/**
- * Created by Quang Ly on 11/1/2017.
- */
 
 public class NormalNewFeedFragment extends Fragment {
 
@@ -80,14 +79,14 @@ public class NormalNewFeedFragment extends Fragment {
                 //load data in view holder
                 ivLoading.setVisibility(View.INVISIBLE);
                 viewHolder.loadData(getContext(), model);
-//                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        Intent intent = new Intent(getContext(), FoodDetailActivity.class).putExtra("post",model);
-//                        Log.d("Detail","Des: "+model.getDescription());
-//                        startActivity(intent);
-//                    }
-//                });
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(getContext(), FoodDetailActivity.class).putExtra("post",model);
+                        Log.d("Detail","Des: "+model.getDescription());
+                        startActivity(intent);
+                    }
+                });
             }
         };
         rvNewFeed.setAdapter(firebaseRecyclerAdapter);
