@@ -1,7 +1,9 @@
-package greenlife.com.vn.greenfood;
+package greenlife.com.vn.greenfood.activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import greenlife.com.vn.greenfood.R;
 
 public class AddFoodActivity extends AppCompatActivity {
 
