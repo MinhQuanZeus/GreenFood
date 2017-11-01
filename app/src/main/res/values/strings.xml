@@ -48,4 +48,14 @@
     <string name="dont_match_password">Không khớp với mật khẩu bạn nhập</string>
     <string name="invalid_username_or_password">Sai email hoặc mật khẩu</string>
     <string name="login_success">Đăng nhập thành công</string>
+
+    <string name="bottom_button_sell">Đăng bán</string>
+    <string name="upload_image_empty">Thêm hình ảnh</string>
+    <string name="hint_input_food_name">Tên thức ăn</string>
+    <string name="hint_input_food_description">Mô tả</string>
+    <string name="hint_input_food_price">Giá</string>
+    <string name="hint_input_food_quantity">Số Lượng</string>
+    <string name="hint_input_food_address">Địa Chỉ</string>
+
+
 </resources>
