@@ -45,6 +45,7 @@ dependencies {
     compile 'com.allattentionhere:fabulousfilter:0.0.2'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'com.facebook.android:account-kit-sdk:4.+'
+    compile 'com.github.ybq:Android-SpinKit:1.1.0'
     compile 'com.google.android:flexbox:0.3.0'
     testCompile 'junit:junit:4.12'
 }
