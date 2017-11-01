@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.allattentionhere.fabulousfilter.AAH_FabulousFragment;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.github.ybq.android.spinkit.SpinKitView;
 import com.google.firebase.database.DataSnapshot;
@@ -24,10 +26,14 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 
 import greenlife.com.vn.greenfood.R;
 import greenlife.com.vn.greenfood.activities.FoodDetailActivity;
+import greenlife.com.vn.greenfood.models.FilterTag;
 import greenlife.com.vn.greenfood.models.Post;
 import greenlife.com.vn.greenfood.models.User;
 import greenlife.com.vn.greenfood.network.RetrofitFactory;
@@ -43,7 +49,7 @@ import retrofit2.Response;
 import static android.content.ContentValues.TAG;
 
 
-public class NormalNewFeedFragment extends Fragment {
+public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragment.Callbacks{
 
     private static final String NO_INTERNET_CONNECTION = "Vui lòng kiểm tra lại kết nối mạng";
     private RecyclerView rvNewFeed;
@@ -60,9 +66,12 @@ public class NormalNewFeedFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-
         //get data from firebase
         Query query = databaseReference.orderByChild("time");
+        updateNewFeedByQuery(query);
+    }
+
+    public void updateNewFeedByQuery(Query query){
         firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Post, PostViewHolder>(
                 Post.class,
                 R.layout.item_food,
@@ -91,6 +100,7 @@ public class NormalNewFeedFragment extends Fragment {
         };
         rvNewFeed.setAdapter(firebaseRecyclerAdapter);
     }
+
 
     public static class PostViewHolder extends RecyclerView.ViewHolder{
         private TextView tvFoodName;
@@ -246,5 +256,22 @@ public class NormalNewFeedFragment extends Fragment {
     public void onResume() {
         firebaseRecyclerAdapter.notifyDataSetChanged();
         super.onResume();
+    }
+
+    @Override
+    public void onResult(Object result) {
+        HashMap<String, FilterTag> applied_filters = (HashMap<String, FilterTag>) result;
+        Log.v("Tungds", applied_filters.toString());
+        if (applied_filters.get("time")!=null){
+            int periodTime = applied_filters.get("time").getValue();
+            Query query = null;
+            if (periodTime<= 12){
+                String dateString = LibrarySupportManager.getDateString(new Date(new Date().getTime() - periodTime*60*60*1000));
+                query = databaseReference.orderByChild("time").startAt(dateString);
+            }else{
+                query = databaseReference.orderByChild("time");
+            }
+            updateNewFeedByQuery(query);
+        }
     }
 }

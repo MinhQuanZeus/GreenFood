@@ -38,11 +38,14 @@ public class LibrarySupportManager {
     }
 
     public static String currentDateTime(){
-        return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
-                .format(new Date())
-                .replace(" ", " lúc ");
+        return getDateString(new Date());
     }
 
+    public static String getDateString(Date date){
+        return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+                .format(date)
+                .replace(" ", " lúc ");
+    }
 
 
     public static String formatCurrency(long currency){
