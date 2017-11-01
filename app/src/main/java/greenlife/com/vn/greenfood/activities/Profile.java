@@ -35,11 +35,13 @@ public class Profile extends AppCompatActivity implements View.OnClickListener{
     String defineUser;
     LinearLayout change_setting;
     Button btnfollow;
+    TextView btn_fixInfor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        defineUser = getIntent().getExtras().toString().trim();
+        mAuth = FirebaseAuth.getInstance();
+        defineUser = getIntent().getStringExtra("uerID");
         String uId = mAuth.getCurrentUser().getUid();
         isAvatar = (ImageView)findViewById(R.id.iv_profile_image);
         userName = (TextView)findViewById(R.id.tv_username);
@@ -47,7 +49,9 @@ public class Profile extends AppCompatActivity implements View.OnClickListener{
         link = (TextView)findViewById(R.id.tv_link);
         noPost = (TextView)findViewById(R.id.tv_NoPost);
         noFollow = (TextView)findViewById(R.id.tv_NoFollow);
+        change_setting = (LinearLayout) findViewById(R.id.ln_edit_profile);
         btnfollow = (Button)findViewById(R.id.btn_follow);
+        btn_fixInfor = (TextView)findViewById(R.id.btn_fixInfor);
         if(defineUser==null || defineUser.equalsIgnoreCase(uId)){
             getUser(this,uId);
             change_setting.setVisibility(View.VISIBLE);
@@ -58,6 +62,8 @@ public class Profile extends AppCompatActivity implements View.OnClickListener{
             change_setting.setVisibility(View.INVISIBLE);
             btnfollow.setVisibility(View.VISIBLE);
         }
+
+        btn_fixInfor.setOnClickListener(this);
 
     }
 
@@ -81,14 +87,14 @@ public class Profile extends AppCompatActivity implements View.OnClickListener{
                         // set user name
                         userName.setText(user.getName());
                         // set description
-                        if(!user.getDescription().isEmpty()){
+                        if(user.getDescription() != null){
                             description.setText(user.getDescription());
                         }
                         else {
                             description.setText("");
                         }
                         // set link
-                        if(!user.getLink().isEmpty()){
+                        if(user.getLink()!=null){
                             link.setText(user.getLink());
                         }
                         else {
@@ -110,7 +116,9 @@ public class Profile extends AppCompatActivity implements View.OnClickListener{
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_fixInfor:
+                Log.d("Profile", "onclick");
                 Intent changeProfile = new Intent(this,ChangeProfileActivity.class);
+                startActivity(changeProfile);
                 break;
            // case R.id.
         }

@@ -85,6 +85,7 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mAuth = FirebaseAuth.getInstance();
         // get ID user
         String uId = mAuth.getCurrentUser().getUid();
         // define control
@@ -130,23 +131,27 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
                         // set user name
                         username.setText(user.getName());
                         // get description
-                        if(!user.getDescription().isEmpty()){
+                        if(user.getDescription()!= null){
                             description.setText(user.getDescription());
                         }
                         else {
                             description.setText("");
                         }
                         // get link
-                        if(!user.getLink().isEmpty()){
+                        if(user.getLink()!=null){
                             link.setText(user.getLink());
                         }
                         else {
                             link.setText("");
                         }
                         // get mail
-                        mail.setText(mAuth.getCurrentUser().getEmail());
+                        if(mAuth.getCurrentUser().getEmail()!=null){
+                            mail.setText(mAuth.getCurrentUser().getEmail());
+                        }
                         // get phone
-                        phone.setText(user.getPhone());
+                        if(user.getPhone()!=null){
+                            phone.setText(user.getPhone());
+                        }
                     }
 
                     @Override
