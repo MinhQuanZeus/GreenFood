@@ -57,5 +57,7 @@
     <string name="hint_input_food_quantity">Số Lượng</string>
     <string name="hint_input_food_address">Địa Chỉ</string>
 
+    <string name="post_title">Post</string>
+
 
 </resources>

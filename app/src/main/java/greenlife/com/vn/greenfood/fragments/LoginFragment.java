@@ -190,7 +190,7 @@ public class LoginFragment extends Fragment {
     }
 
     public void onLoginFailed() {
-        Toast.makeText(getContext(), "Đăng nhập không thành công", Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), "Đăngn nhập không thàh công", Toast.LENGTH_LONG).show();
 
         _loginButton.setEnabled(true);
     }
