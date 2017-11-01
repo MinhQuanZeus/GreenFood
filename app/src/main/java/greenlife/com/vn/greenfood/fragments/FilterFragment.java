@@ -5,11 +5,14 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.ArrayMap;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,16 +26,15 @@ import com.google.android.flexbox.FlexboxLayout;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import greenlife.com.vn.greenfood.R;
+import greenlife.com.vn.greenfood.models.FilterTag;
 
-/**
- * Created by Quang Ly on 11/1/2017.
- */
 
 public class FilterFragment extends AAH_FabulousFragment {
-    ArrayMap<String, List<String>> applied_filters = new ArrayMap<>();
+    HashMap<String, FilterTag> applied_filters = new HashMap<>();
     List<TextView> textviews = new ArrayList<>();
 
     TabLayout tabs_types;
@@ -41,6 +43,8 @@ public class FilterFragment extends AAH_FabulousFragment {
     private DisplayMetrics metrics;
     private SensorManager sensorManager;
 
+    private TextView currentRateTv = null;
+    private TextView currentTimeTv = null;
 
     public static FilterFragment newInstance() {
         FilterFragment mff = new FilterFragment();
@@ -103,7 +107,23 @@ public class FilterFragment extends AAH_FabulousFragment {
         //params to set
         setAnimationDuration(600); //optional; default 500ms
         setPeekHeight(300); // optional; default 400dp
-//        setCallbacks((Callbacks) getActivity()); //optional; to get back result
+
+        //get NormalNewFeedFragment and setCallback
+        List<Fragment> fragments = getActivity().getSupportFragmentManager().getFragments();
+        for (Fragment fragment:fragments){
+            if (fragment instanceof NewFeedFragment){
+                List<Fragment> childFragments = fragment.getChildFragmentManager().getFragments();
+                for(Fragment cf: childFragments){
+                    if (cf instanceof NormalNewFeedFragment){
+                        setCallbacks((Callbacks) cf);
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+
         setViewgroupStatic(ll_buttons); // optional; layout to stick at bottom on slide
         setViewPager(vp_types); //optional; if you use viewpager that has scrollview
         setViewMain(rl_content); //necessary; main bottomsheet view
@@ -163,7 +183,7 @@ public class FilterFragment extends AAH_FabulousFragment {
     }
 
     private void inflateLayoutWithFilters(final String filter_category, FlexboxLayout fbl) {
-        List<String> keys = new ArrayList<>();
+        List<FilterTag> keys = new ArrayList<>();
         switch (filter_category) {
             case "rating":
                 keys = getUniqueRatingKeys();
@@ -172,48 +192,86 @@ public class FilterFragment extends AAH_FabulousFragment {
                 keys = getUniqueTimeKeys();
                 break;
         }
+        for (int i = 0; i < keys.size(); i++) {
+            View subchild = getActivity().getLayoutInflater().inflate(R.layout.single_chip, null);
+            final TextView tv = ((TextView) subchild.findViewById(R.id.txt_title));
+            tv.setText(keys.get(i).getKey());
+            final int finalI = i;
+            final List<FilterTag> finalKeys = keys;
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (tv.getTag() != null && tv.getTag().equals("selected")) {
+                        tv.setTag("unselected");
+                        tv.setBackgroundResource(R.drawable.chip_unselected);
+                        tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_chips));
+                        removeFromSelectedMap(filter_category);
+                    } else {
+                        tv.setTag("selected");
+                        tv.setBackgroundResource(R.drawable.chip_selected);
+                        tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_header));
+                        addToSelectedMap(filter_category, finalKeys.get(finalI));
 
-    }
-
-    private void addToSelectedMap(String key, String value) {
-        if (applied_filters.get(key) != null && !applied_filters.get(key).contains(value)) {
-            applied_filters.get(key).add(value);
-        } else {
-            List<String> temp = new ArrayList<>();
-            temp.add(value);
-            applied_filters.put(key, temp);
-        }
-    }
-
-    private void removeFromSelectedMap(String key, String value) {
-        if(applied_filters.get(key)!=null) {
-            if (applied_filters.get(key).size() == 1) {
-                applied_filters.remove(key);
+                        if (filter_category.equals("rating")){
+                            if (currentRateTv != null){
+                                currentRateTv.setTag("unselected");
+                                currentRateTv.setBackgroundResource(R.drawable.chip_unselected);
+                                currentRateTv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_chips));
+                            }
+                            currentRateTv = tv;
+                        }else if (filter_category.equals("time")){
+                            if (currentTimeTv!=null){
+                                currentTimeTv.setTag("unselected");
+                                currentTimeTv.setBackgroundResource(R.drawable.chip_unselected);
+                                currentTimeTv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_chips));
+                            }
+                            currentTimeTv = tv;
+                        }
+                    }
+                }
+            });
+            if (applied_filters != null && applied_filters.get(filter_category) != null && applied_filters.get(filter_category).equals(keys.get(finalI))) {
+                tv.setTag("selected");
+                tv.setBackgroundResource(R.drawable.chip_selected);
+                tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_header));
             } else {
-                applied_filters.get(key).remove(value);
+                tv.setBackgroundResource(R.drawable.chip_unselected);
+                tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_chips));
             }
+            textviews.add(tv);
+
+            fbl.addView(subchild);
         }
+
+
+    }
+
+    private void addToSelectedMap(String key, FilterTag value) {
+        applied_filters.put(key, value);
+    }
+
+    private void removeFromSelectedMap(String key) {
+        applied_filters.remove(key);
     }
 
 
-    public List<String> getUniqueRatingKeys() {
-        List<String> rating = new ArrayList<>();
-        rating.add(">= 0");
-        rating.add(">= 1");
-        rating.add(">= 2");
-        rating.add(">= 3");
-        rating.add(">= 4");
-        Collections.sort(rating);
+    public List<FilterTag> getUniqueRatingKeys() {
+        List<FilterTag> rating = new ArrayList<>();
+        rating.add(new FilterTag(">= 0", 0));
+        rating.add(new FilterTag(">= 1", 1));
+        rating.add(new FilterTag(">= 2", 2));
+        rating.add(new FilterTag(">= 3", 3));
+        rating.add(new FilterTag(">= 4", 4));
         return rating;
     }
 
-    public List<String> getUniqueTimeKeys() {
-        List<String> rating = new ArrayList<>();
-        rating.add("<= 01h");
-        rating.add("<= 03h");
-        rating.add("<= 12h");
-        rating.add("<= 24h");
-        Collections.sort(rating);
+    public List<FilterTag> getUniqueTimeKeys() {
+        List<FilterTag> rating = new ArrayList<>();
+
+        rating.add(new FilterTag("<= 1", 1));
+        rating.add(new FilterTag("<= 3", 3));
+        rating.add(new FilterTag("<= 12", 12));
+        rating.add(new FilterTag("> 12", 13));
         return rating;
     }
 

@@ -21,8 +21,8 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
         switch (position){
             case 0:
                 return new NormalNewFeedFragment();
-            case 1:
-                return new NormalNewFeedFragment();
+//            case 1:
+//                return new NormalNewFeedFragment();
             default:
                 return new NormalNewFeedFragment();
         }
