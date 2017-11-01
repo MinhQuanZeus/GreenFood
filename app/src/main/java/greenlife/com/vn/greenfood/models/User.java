@@ -9,11 +9,13 @@ public class User {
     private String avatar;
     private long rating;
     private String tokenID;
+    private String description;
+    private String link;
 
     public User() {
     }
 
-    public User(String userID, String name, String phone, String address, String avatar, long rating, String tokenID) {
+    public User(String userID, String name, String phone, String address, String avatar, long rating, String tokenID, String description, String link) {
         this.userID = userID;
         this.name = name;
         this.phone = phone;
@@ -21,6 +23,8 @@ public class User {
         this.avatar = avatar;
         this.rating = rating;
         this.tokenID = tokenID;
+        this.description = description;
+        this.link = link;
     }
 
     public String getUserID() {
@@ -49,5 +53,13 @@ public class User {
 
     public String getTokenID() {
         return tokenID;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getLink() {
+        return link;
     }
 }

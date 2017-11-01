@@ -1,26 +1,68 @@
 package greenlife.com.vn.greenfood.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import greenlife.com.vn.greenfood.R;
+import greenlife.com.vn.greenfood.models.User;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
-public class Profile extends AppCompatActivity {
+public class Profile extends AppCompatActivity implements View.OnClickListener{
     private FirebaseAuth mAuth;
+    private User user;
+    ImageView isAvatar;
+    TextView userName;
+    TextView description;
+    TextView link;
+    TextView noPost;
+    TextView noFollow;
+    String defineUser;
+    LinearLayout change_setting;
+    Button btnfollow;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        defineUser = getIntent().getExtras().toString().trim();
         String uId = mAuth.getCurrentUser().getUid();
+        isAvatar = (ImageView)findViewById(R.id.iv_profile_image);
+        userName = (TextView)findViewById(R.id.tv_username);
+        description = (TextView)findViewById(R.id.tv_description);
+        link = (TextView)findViewById(R.id.tv_link);
+        noPost = (TextView)findViewById(R.id.tv_NoPost);
+        noFollow = (TextView)findViewById(R.id.tv_NoFollow);
+        btnfollow = (Button)findViewById(R.id.btn_follow);
+        if(defineUser==null || defineUser.equalsIgnoreCase(uId)){
+            getUser(this,uId);
+            change_setting.setVisibility(View.VISIBLE);
+            btnfollow.setVisibility(View.INVISIBLE);
+        }
+        else {
+            getUser(this,defineUser);
+            change_setting.setVisibility(View.INVISIBLE);
+            btnfollow.setVisibility(View.VISIBLE);
+        }
+
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     private void getUser(final Context context, String userID) {
@@ -32,12 +74,29 @@ public class Profile extends AppCompatActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         User user = dataSnapshot.getValue(User.class);
                         setUser(user);
-                        tvUserName.setText(user.getName());
                         Picasso.with(context)
                                 .load(user.getAvatar())
                                 .transform(new CropCircleTransformation())
-                                .into(ivAvatar);
-                        Log.d(TAG, "Fail user : " + user.getTokenID());
+                                .into(isAvatar);
+                        // set user name
+                        userName.setText(user.getName());
+                        // set description
+                        if(!user.getDescription().isEmpty()){
+                            description.setText(user.getDescription());
+                        }
+                        else {
+                            description.setText("");
+                        }
+                        // set link
+                        if(!user.getLink().isEmpty()){
+                            link.setText(user.getLink());
+                        }
+                        else {
+                            link.setText("");
+                        }
+//                        noPost.setText(user.);
+//                        noFollow.setText(user.);
+
                     }
 
                     @Override
@@ -45,5 +104,15 @@ public class Profile extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btn_fixInfor:
+                Intent changeProfile = new Intent(this,ChangeProfileActivity.class);
+                break;
+           // case R.id.
+        }
     }
 }
