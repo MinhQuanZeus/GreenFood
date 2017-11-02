@@ -2,6 +2,7 @@ package greenlife.com.vn.greenfood.activities;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,9 +23,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -40,7 +39,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -71,6 +69,7 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
     private Bitmap mImageToBeAttached;
     private DatabaseReference mDatabaseReference;
     private StorageReference mStorageReference;
+    private ProgressDialog progressDialog;
     private FirebaseAuth mAuth;
     private User user;
     ImageView isAvatar;
@@ -78,8 +77,8 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
     EditText username;
     EditText description;
     EditText link;
-    EditText mail;
-    EditText phone;
+    TextView mail;
+    TextView phone;
     Toolbar statusToolBar;
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -95,10 +94,12 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
         username = (EditText)findViewById(R.id.et_username);
         description = (EditText)findViewById(R.id.et_description);
         link = (EditText)findViewById(R.id.et_link);
-        mail = (EditText)findViewById(R.id.et_mail);
-        phone = (EditText)findViewById(R.id.et_phone);
+        mail = (TextView)findViewById(R.id.et_mail);
+        phone = (TextView)findViewById(R.id.et_phone);
         // set toolbar
         statusToolBar = (Toolbar)findViewById(R.id.tb_status);
+        isAvatar.setOnClickListener(this);
+        changeAvatar.setOnClickListener(this);
         statusToolBar.setTitle("Chỉnh sửa trang cá nhân");
         statusToolBar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(statusToolBar);
@@ -135,14 +136,14 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
                             description.setText(user.getDescription());
                         }
                         else {
-                            description.setText("");
+                            description.setText("intro");
                         }
                         // get link
                         if(user.getLink()!=null){
                             link.setText(user.getLink());
                         }
                         else {
-                            link.setText("");
+                            link.setText("social web");
                         }
                         // get mail
                         if(mAuth.getCurrentUser().getEmail()!=null){
@@ -167,8 +168,6 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode != RESULT_OK) {
-//            if (mCurrentTaskToAttachImage != null)
-//                mCurrentTaskToAttachImage = null;
             return;
         }
 
@@ -193,15 +192,10 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
                     Matrix matrix = new Matrix();
                     matrix.setRotate(rotationAngle, (float) mImageToBeAttached.getWidth() / 2, (float) mImageToBeAttached.getHeight() / 2);
                     mImageToBeAttached = Bitmap.createBitmap(mImageToBeAttached, 0, 0, options.outWidth, options.outHeight, matrix, true);
+                    isAvatar.setImageBitmap(mImageToBeAttached);
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
-
-//                if (mCurrentTaskToAttachImage == null) {
-//                    thumbnail = ThumbnailUtils.extractThumbnail(mImageToBeAttached, size, size);
-//                }
-
-                // Delete the temporary image file
                 file.delete();
             }
             mImagePathToBeAttached = null;
@@ -215,27 +209,9 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
                 Matrix matrix = new Matrix();
                 matrix.setRotate(rotationAngle, (float) mImageToBeAttached.getWidth() / 2, (float) mImageToBeAttached.getHeight() / 2);
                 mImageToBeAttached = Bitmap.createBitmap(mImageToBeAttached, 0, 0, mImageToBeAttached.getWidth(), mImageToBeAttached.getHeight(), matrix, true);
-//                if (mCurrentTaskToAttachImage == null) {
-//                    AssetFileDescriptor asset = resolver.openAssetFileDescriptor(uri, "r");
-//                    thumbnail = ImageUtil.thumbnailFromDescriptor(asset.getFileDescriptor(), size, size);
-//                }
             } catch (IOException e) {
             }
         }
-
-//        if (mImageToBeAttached != null) {
-//            if (mCurrentTaskToAttachImage != null) {
-//                attachImage(mCurrentTaskToAttachImage, mImageToBeAttached);
-//                mImageToBeAttached = null;
-//            }
-//        }
-
-//        if (thumbnail != null) {
-//            ImageView imageView = (ImageView) findViewById(R.id.image);
-//            imageView.setImageBitmap(thumbnail);
-//        }
-
-        // Ensure resetting the task to attach an image
         updateUI();
     }
 
@@ -297,9 +273,6 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
             mImageToBeAttached.recycle();
             mImageToBeAttached = null;
         }
-//        ViewGroup view = (ViewGroup) findViewById(R.id.create_task);
-//        ImageView imageView = (ImageView) view.findViewById(R.id.image);
-//        imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_camera));
     }
 
     private void displayAttachImageDialog() {
@@ -310,7 +283,7 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
             items = new CharSequence[]{"Take photo", "Choose photo"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Anh dai dien");
+        builder.setTitle("Ảnh đại diện");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
@@ -369,6 +342,7 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
                 displayAttachImageDialog();
                 break;
             case R.id.tv_changeAvatar:
+
                 displayAttachImageDialog();
                 break;
         }
@@ -397,33 +371,39 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
         }catch (Exception ex){
 
         }
-        mDatabaseReference.child("name").setValue(username.getText());
-        mDatabaseReference.child("phone").setValue(phone.getText());
-        mDatabaseReference.child("description").setValue(description.getText());
-        mDatabaseReference.child("link").setValue(link.getText());
-        mDatabaseReference.child("mail").setValue(mail.getText());
+        mDatabaseReference.child("name").setValue(username.getText().toString());
+        mDatabaseReference.child("phone").setValue(phone.getText().toString());
+        mDatabaseReference.child("description").setValue(description.getText().toString());
+        mDatabaseReference.child("link").setValue(link.getText().toString());
+        mDatabaseReference.child("mail").setValue(mail.getText().toString());
 
         // upload image
         if(mImageToBeAttached !=null){
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            mImageToBeAttached.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            mImageToBeAttached.compress(Bitmap.CompressFormat.JPEG, 75, baos);
             final byte[] data = baos.toByteArray();
             UploadTask uploadTask = mStorageReference.putBytes(data);
+            progressDialog = new ProgressDialog(ChangeProfileActivity.this);
+            progressDialog.setTitle("Post Food");
+            progressDialog.show();
             uploadTask.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
+                    progressDialog.dismiss();
                     Toast.makeText(getBaseContext(), "Vui lòng kiểm tra kết nối mạng!", Toast.LENGTH_SHORT).show();
                 }
             }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    progressDialog.dismiss();
                     Uri downloadUrl = taskSnapshot.getDownloadUrl();
                     mDatabaseReference.child("avatar").setValue(downloadUrl.toString());
                 }
             }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onProgress(final UploadTask.TaskSnapshot taskSnapshot) {
-
+                    double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                    progressDialog.setMessage(((int)progress) + "% Updating...");
                 }
             });
         }

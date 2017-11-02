@@ -3,5 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <item android:id="@+id/action_done"
-        android:title="Xong" app:showAsAction="ifRoom"/>
+        android:title="Xong" app:showAsAction="ifRoom"
+        
+        />
 </menu>
