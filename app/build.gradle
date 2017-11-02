@@ -51,6 +51,7 @@ dependencies {
     compile 'com.facebook.android:account-kit-sdk:4.+'
     compile 'com.github.ybq:Android-SpinKit:1.1.0'
     compile 'com.google.android:flexbox:0.3.0'
+    compile 'de.hdodenhof:circleimageview:1.3.0'
     testCompile 'junit:junit:4.12'
 }
 

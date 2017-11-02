@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="greenlife.com.vn.greenfood.activities.Profile">
+    tools:context="greenlife.com.vn.greenfood.activities.ProfileActivity">
     <android.support.v7.widget.Toolbar
         android:id="@+id/tb_status"
         android:background="@color/primary"
