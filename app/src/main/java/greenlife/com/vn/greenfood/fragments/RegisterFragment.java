@@ -95,7 +95,6 @@ public class RegisterFragment extends Fragment {
     private Button btnSend;
 
 
-
     public RegisterFragment() {
         // Required empty public constructor
     }
@@ -118,18 +117,18 @@ public class RegisterFragment extends Fragment {
 
 
     private void setupUI(View view) {
-        rlAvatar =(RelativeLayout) view.findViewById(R.id.rl_layout_image);
-        rlEmptyAvatar =(RelativeLayout) view.findViewById(R.id.rl_layout_empty_image);
-        ivAvatar = (ImageView)view.findViewById(R.id.iv_avatar);
-        ivAvatarBlur = (ImageView)view.findViewById(R.id.iv_blur);
-        ivAddAvatar = (ImageView)view.findViewById(R.id.iv_add_image);
-        edName = (EditText)view.findViewById(R.id.et_full_name);
-        edEmail = (EditText)view.findViewById(R.id.et_email);
-        edPassword = (EditText)view.findViewById(R.id.et_password);
-        edConfPassword = (EditText)view.findViewById(R.id.et_confirm_password);
-        edAddress = (EditText)view.findViewById(R.id.et_address);
-        edPhone = (EditText)view.findViewById(R.id.et_phone);
-        btnSend = (Button)view.findViewById(R.id.btn_send);
+        rlAvatar = (RelativeLayout) view.findViewById(R.id.rl_layout_image);
+        rlEmptyAvatar = (RelativeLayout) view.findViewById(R.id.rl_layout_empty_image);
+        ivAvatar = (ImageView) view.findViewById(R.id.iv_avatar);
+        ivAvatarBlur = (ImageView) view.findViewById(R.id.iv_blur);
+        ivAddAvatar = (ImageView) view.findViewById(R.id.iv_add_image);
+        edName = (EditText) view.findViewById(R.id.et_full_name);
+        edEmail = (EditText) view.findViewById(R.id.et_email);
+        edPassword = (EditText) view.findViewById(R.id.et_password);
+        edConfPassword = (EditText) view.findViewById(R.id.et_confirm_password);
+        edAddress = (EditText) view.findViewById(R.id.et_address);
+        edPhone = (EditText) view.findViewById(R.id.et_phone);
+        btnSend = (Button) view.findViewById(R.id.btn_send);
         edPhone.setText(phoneNumber);
         edPhone.setEnabled(false);
 
@@ -148,11 +147,11 @@ public class RegisterFragment extends Fragment {
 
     }
 
-    private void signUP(){
-        if(!validate()){
+    private void signUP() {
+        if (!validate()) {
             return;
-        }else{
-            if (!NetworkUtils.isConnected()){
+        } else {
+            if (!NetworkUtils.isConnected()) {
                 Toast.makeText(getContext(), getResources().getString(R.string.no_network),
                         Toast.LENGTH_SHORT).show();
                 btnSend.setEnabled(true);
@@ -193,7 +192,7 @@ public class RegisterFragment extends Fragment {
         }
     }
 
-    private void creatUser(){
+    private void creatUser() {
         try {
             mDatabaseReference = FirebaseDatabase.getInstance()
                     .getReference()
@@ -202,7 +201,7 @@ public class RegisterFragment extends Fragment {
             mStorageReference = FirebaseStorage.getInstance()
                     .getReference()
                     .child(mAuth.getCurrentUser().getUid());
-        }catch (Exception ex){
+        } catch (Exception ex) {
 
         }
         // final DatabaseReference newPost = mDatabaseReference.push();
@@ -211,30 +210,33 @@ public class RegisterFragment extends Fragment {
         mDatabaseReference.child("phone").setValue(edPhone.getText().toString());
         mDatabaseReference.child("rate").setValue("");
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        mImageToBeAttached.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        final byte[] data = baos.toByteArray();
-        UploadTask uploadTask = mStorageReference.putBytes(data);
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-                Toast.makeText(getActivity(), getResources().getString(R.string.no_network), Toast.LENGTH_SHORT).show();
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                mDatabaseReference.child("avatar").setValue(downloadUrl.toString());
-            }
-        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onProgress(final UploadTask.TaskSnapshot taskSnapshot) {
-                //Processdialog
-                //double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-            }
-        });
+        if (mImageToBeAttached != null) {
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            mImageToBeAttached.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            final byte[] data = baos.toByteArray();
+            UploadTask uploadTask = mStorageReference.putBytes(data);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle unsuccessful uploads
+                    Toast.makeText(getActivity(), getResources().getString(R.string.no_network), Toast.LENGTH_SHORT).show();
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                    mDatabaseReference.child("avatar").setValue(downloadUrl.toString());
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(final UploadTask.TaskSnapshot taskSnapshot) {
+                }
+            });
+        }else{
+            mDatabaseReference.child("avatar").setValue("https://www.google.com.vn/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwj4gNqj4Z3XAhWDk5QKHeZsBi4QjRwIBw&url=http%3A%2F%2Fwww.limestone.edu%2Facademics%2Ffaculty%2Fann-wyatt&psig=AOvVaw2X5Gm-n8UPbIatONQ5O0BD&ust=1509638868216014");
+        }
 
     }
 
@@ -244,6 +246,7 @@ public class RegisterFragment extends Fragment {
         String email = edEmail.getText().toString();
         String password = edPassword.getText().toString();
         String confPassword = edConfPassword.getText().toString();
+        String regex = "^(?i)(?=.*[a-z])(?=.*[0-9])[a-z0-9#.!@$*&_]{5,}$";
 
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             edEmail.setError(getResources().getString(R.string.invalid_email));
@@ -252,14 +255,14 @@ public class RegisterFragment extends Fragment {
             edEmail.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 4) {
+        if (password.isEmpty() || password.matches(regex)) {
             edPassword.setError(getResources().getString(R.string.short_password));
             valid = false;
         } else {
             edPassword.setError(null);
         }
 
-        if(!confPassword.equals(password)){
+        if (!confPassword.equals(password)) {
             edConfPassword.setError(getResources().getString(R.string.dont_match_password));
             valid = false;
         }
@@ -286,13 +289,9 @@ public class RegisterFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode != RESULT_OK) {
-//            if (mCurrentTaskToAttachImage != null)
-//                mCurrentTaskToAttachImage = null;
             return;
         }
 
-        // final int size = THUMBNAIL_SIZE;
-        Bitmap thumbnail = null;
         if (requestCode == REQUEST_TAKE_PHOTO) {
             File file = new File(mImagePathToBeAttached);
             if (file.exists()) {
@@ -301,10 +300,10 @@ public class RegisterFragment extends Fragment {
                 BitmapFactory.decodeFile(mImagePathToBeAttached, options);
                 options.inJustDecodeBounds = false;
                 mImageToBeAttached = BitmapFactory.decodeFile(mImagePathToBeAttached, options);
-                try{
+                try {
                     ExifInterface exif = new ExifInterface(mImagePathToBeAttached);
                     String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
-                    int orientation = orientString != null ? Integer.parseInt(orientString) :  ExifInterface.ORIENTATION_NORMAL;
+                    int orientation = orientString != null ? Integer.parseInt(orientString) : ExifInterface.ORIENTATION_NORMAL;
                     int rotationAngle = 0;
                     if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
                     if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
@@ -312,15 +311,9 @@ public class RegisterFragment extends Fragment {
                     Matrix matrix = new Matrix();
                     matrix.setRotate(rotationAngle, (float) mImageToBeAttached.getWidth() / 2, (float) mImageToBeAttached.getHeight() / 2);
                     mImageToBeAttached = Bitmap.createBitmap(mImageToBeAttached, 0, 0, options.outWidth, options.outHeight, matrix, true);
-                }catch (Exception ex){
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-
-//                if (mCurrentTaskToAttachImage == null) {
-//                    thumbnail = ThumbnailUtils.extractThumbnail(mImageToBeAttached, size, size);
-//                }
-
-                // Delete the temporary image file
                 file.delete();
             }
             mImagePathToBeAttached = null;
@@ -329,40 +322,22 @@ public class RegisterFragment extends Fragment {
 
                 Uri uri = data.getData();
                 ContentResolver resolver = getActivity().getContentResolver();
-                int rotationAngle = getOrientation(getActivity(),uri);
+                int rotationAngle = getOrientation(getActivity(), uri);
                 mImageToBeAttached = MediaStore.Images.Media.getBitmap(resolver, uri);
                 Matrix matrix = new Matrix();
                 matrix.setRotate(rotationAngle, (float) mImageToBeAttached.getWidth() / 2, (float) mImageToBeAttached.getHeight() / 2);
                 mImageToBeAttached = Bitmap.createBitmap(mImageToBeAttached, 0, 0, mImageToBeAttached.getWidth(), mImageToBeAttached.getHeight(), matrix, true);
-//                if (mCurrentTaskToAttachImage == null) {
-//                    AssetFileDescriptor asset = resolver.openAssetFileDescriptor(uri, "r");
-//                    thumbnail = ImageUtil.thumbnailFromDescriptor(asset.getFileDescriptor(), size, size);
-//                }
             } catch (IOException e) {
                 Log.e(TAG, "Cannot get a selected photo from the gallery.", e);
             }
         }
-
-//        if (mImageToBeAttached != null) {
-//            if (mCurrentTaskToAttachImage != null) {
-//                attachImage(mCurrentTaskToAttachImage, mImageToBeAttached);
-//                mImageToBeAttached = null;
-//            }
-//        }
-
-//        if (thumbnail != null) {
-//            ImageView imageView = (ImageView) findViewById(R.id.image);
-//            imageView.setImageBitmap(thumbnail);
-//        }
-
-        // Ensure resetting the task to attach an image
         updateUI();
     }
 
     public int getOrientation(Context context, Uri photoUri) {
     /* it's on the external media. */
         Cursor cursor = context.getContentResolver().query(photoUri,
-                new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
+                new String[]{MediaStore.Images.ImageColumns.ORIENTATION}, null, null, null);
 
         if (cursor.getCount() != 1) {
             return -1;
@@ -371,7 +346,6 @@ public class RegisterFragment extends Fragment {
         cursor.moveToFirst();
         return cursor.getInt(0);
     }
-
 
 
     private void dispatchTakePhotoIntent() {
@@ -417,9 +391,6 @@ public class RegisterFragment extends Fragment {
             mImageToBeAttached.recycle();
             mImageToBeAttached = null;
         }
-//        ViewGroup view = (ViewGroup) findViewById(R.id.create_task);
-//        ImageView imageView = (ImageView) view.findViewById(R.id.image);
-//        imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_camera));
     }
 
     private void displayAttachImageDialog() {
