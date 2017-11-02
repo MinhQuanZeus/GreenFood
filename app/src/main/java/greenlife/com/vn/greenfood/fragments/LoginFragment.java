@@ -163,6 +163,9 @@ public class LoginFragment extends Fragment {
                             user.getIdToken(true);
                             Toast.makeText(getContext(), getResources().getString(R.string.login_success),
                                     Toast.LENGTH_SHORT).show();
+                            SharedPreferences pre = getActivity().getSharedPreferences(prefname, MODE_PRIVATE);
+                            SharedPreferences.Editor editor = pre.edit();
+                            editor.putBoolean("isLogin", true);
                             sendRegistrationToServer(user.getUid());
                             FirebaseMessaging.getInstance().subscribeToTopic(user.getUid());
                             Intent intent = new Intent(getContext(), MainActivity.class);

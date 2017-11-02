@@ -42,6 +42,7 @@ import java.util.Map;
 import greenlife.com.vn.greenfood.fragments.rating_fragment.RatingDialogFragment;
 import greenlife.com.vn.greenfood.network.models.distance.MainObject;
 import greenlife.com.vn.greenfood.network.services.GetDistanceService;
+import greenlife.com.vn.greenfood.utils.FirebaseUntils;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -384,6 +385,7 @@ public class FoodDetailActivity extends AppCompatActivity {
 
     private void sendOrderNotificationMessage() {
         //get Token ID
+        final User buyer = FirebaseUntils.getInstance().getUserByID(post.getUserID());
         getUser(this, post.getUserID());
         Log.d(TAG, "address ID : " + sellerUser.getTokenID());
         MapsUltils.getUser(this, firebaseAuth.getCurrentUser().getUid(), new GetUserFromIDListener() {
@@ -392,16 +394,8 @@ public class FoodDetailActivity extends AppCompatActivity {
                 Order order = null;
                 Log.d(TAG, "token ID : " + user.getTokenID());
                 final String now = LibrarySupportManager.getInstance().currentDateTime();
-                if (post != null) {
-                    order = new Order(
-                            firebaseAuth.getCurrentUser().getUid(),
-                            user.getName(),
-                            post.getUserID(),
-                            tvFoodName.getText().toString(),
-                            post.getImage(),
-                            "order",
-                            now
-                    );
+                if(post != null){
+                    order = new Order(firebaseAuth.getCurrentUser().getUid(),buyer.getName(),post.getUserID(),post.getTitle(), post.getImage(),"order",now,"order");
                 }
 
                 Log.d(TAG, "my order : " + order.toString());

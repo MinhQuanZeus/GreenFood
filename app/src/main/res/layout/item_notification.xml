@@ -19,11 +19,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <ImageView
+                <greenlife.com.vn.greenfood.utils.RoundImageView
                     android:id="@+id/iv_notification"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:background="@color/colorAccent"
                     android:scaleType="centerCrop" />
 
                 <TextView

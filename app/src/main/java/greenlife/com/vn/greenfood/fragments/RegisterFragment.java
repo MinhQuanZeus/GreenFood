@@ -7,6 +7,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -61,12 +62,14 @@ import greenlife.com.vn.greenfood.utils.NetworkUtils;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class RegisterFragment extends Fragment {
     public static final String TAG = "RegisterFragment";
+    private final String prefname = "my_data";
     public static final int RequestPermissionCode = 1;
     private static final int REQUEST_TAKE_PHOTO = 1;
     private static final int REQUEST_CHOOSE_PHOTO = 2;
@@ -174,6 +177,9 @@ public class RegisterFragment extends Fragment {
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 creatUser();
                                 progressDialog.dismiss();
+                                SharedPreferences pre = getActivity().getSharedPreferences(prefname, MODE_PRIVATE);
+                                SharedPreferences.Editor editor = pre.edit();
+                                editor.putBoolean("isLogin", true);
                                 FirebaseMessaging.getInstance().subscribeToTopic(user.getUid());
                                 Toast.makeText(getActivity(), getResources().getString(R.string.success_register), Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getContext(), MainActivity.class);
