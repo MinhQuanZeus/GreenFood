@@ -146,7 +146,7 @@ public class FoodDetailActivity extends AppCompatActivity {
 
     private void loadData() {
         Intent intent = getIntent();
-        String postID = (String) intent.getSerializableExtra("post");
+        final String postID = (String) intent.getSerializableExtra("post");
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mDatabaseReference.child("post").orderByChild("id").equalTo(postID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -164,12 +164,26 @@ public class FoodDetailActivity extends AppCompatActivity {
                             .into(ivFood);
                     getUser(FoodDetailActivity.this, post.getUserID());
 
+                    tvUserName.setTag(post.getUserID());
+                    ivAvatar.setTag(post.getUserID());
                     //Get distance 2 location, from current user to store
                     tvDistance.setText(MapsUltils.getDistanceFromLocation("22C Thành Công, Khu tập thể Bắc Thành Công, Thành Công, Ba Đình, Hà Nội, Vietnam", post.getAddress(), tvDistance));
                     tvDescription.setText(post.getDescription());
                     tvFoodName.setText((post.getTitle()));
                     tvPrice.setText(formatNumber(post.getPrice()));
                     tvAddress.setText(post.getAddress());
+                    tvUserName.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            redirectToProfile((String)view.getTag());
+                        }
+                    });
+                    ivAvatar.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            redirectToProfile((String)view.getTag());
+                        }
+                    });
                 }
 
             }
@@ -181,6 +195,11 @@ public class FoodDetailActivity extends AppCompatActivity {
         });
        //  User user = MapsUltils.getUser(this, post.getUserID());
 
+    }
+    private void redirectToProfile(String uid){
+        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+        intent.putExtra("userId", uid);
+        startActivity(intent);
     }
 
     private void getUser(final Context context, String userID) {

@@ -63,6 +63,6 @@
     <string name="smilar">Tương tự</string>
     <string name="order_button">Order</string>
     <string name="notification_push">new notification</string>
-    <string name="rating_label">Đánh Gía</string>
+    <string name="rating_label">Đánh Giá</string>
 
 </resources>
