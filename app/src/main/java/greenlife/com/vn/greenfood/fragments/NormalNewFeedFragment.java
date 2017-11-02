@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.allattentionhere.fabulousfilter.AAH_FabulousFragment;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.github.ybq.android.spinkit.SpinKitView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -151,7 +152,8 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
             tvTotalRate.setText("(" + post.getNumberRatePeople() + ")");
 
             //get distance
-            getDistanceFromLocation("22C Thành Công, Khu tập thể Bắc Thành Công, Thành Công, Ba Đình, Hà Nội, Vietnam", post.getAddress());
+            getDistanceFromLocation("Hà Nội", post.getAddress());
+            showLocation(post.getAddress());
 
             //2. Load image food
             Picasso.with(context)
@@ -167,6 +169,24 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
             if (post.getUserID() != null) {
                 getUser(context, post.getUserID());
             }
+        }
+
+        private void showLocation(final String destination) {
+            String uid = FirebaseAuth.getInstance().getUid();
+            final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users/" + uid);
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+                    Log.d("tungds23", user.getAddress());
+                    getDistanceFromLocation(user.getAddress(), destination);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
 
         private String getDistanceFromLocation(String current, final String destinate) {
@@ -269,7 +289,6 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
     @Override
     public void onResult(Object result) {
         HashMap<String, Integer> applied_filters = (HashMap<String, Integer>) result;
-        Log.v("Tungds", applied_filters.toString());
         loadData();
         Query query = databaseReference.orderByChild("time");
         if (applied_filters.get("time") != null) {
