@@ -15,13 +15,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        SharedPreferences pre = this.getSharedPreferences(prefname, MODE_PRIVATE);
-        boolean isLogin = pre.getBoolean("isLogin",false);
-        if(!isLogin){
-            ScreenManager.openFragment(getSupportFragmentManager(),new LoginFragment(), R.id.content,false);
-        }else{
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-        }
+        ScreenManager.openFragment(getSupportFragmentManager(),new LoginFragment(), R.id.content,false);
     }
 }

@@ -53,7 +53,6 @@ public class NotificationFragment extends Fragment {
     private static final String TAG = NotificationFragment.class.getSimpleName();
     private Toolbar toolbar;
     private RecyclerView recyclerView;
-    private List<Order> orderList;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     FirebaseRecyclerAdapter<Order, NotificationViewHolder> firebaseRecyclerAdapter;
@@ -92,18 +91,6 @@ public class NotificationFragment extends Fragment {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),1,GridLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-//        List<Notification> notificationList = new ArrayList<>();
-//        notificationList.add(new Notification("Title","http://media.phunutoday.vn/files/upload_images/2015/11/10/cach-lam-banh-da-cua-1-phunutoday_vn.jpg","This is description"));
-//        notificationList.add(new Notification("Title","http://media.phunutoday.vn/files/upload_images/2015/11/10/cach-lam-banh-da-cua-1-phunutoday_vn.jpg","This is description"));
-//        notificationList.add(new Notification("Title","http://media.phunutoday.vn/files/upload_images/2015/11/10/cach-lam-banh-da-cua-1-phunutoday_vn.jpg","This is description"));
-//        notificationList.add(new Notification("Title","http://media.phunutoday.vn/files/upload_images/2015/11/10/cach-lam-banh-da-cua-1-phunutoday_vn.jpg","This is description"));
-//        notificationList.add(new Notification("Title","http://media.phunutoday.vn/files/upload_images/2015/11/10/cach-lam-banh-da-cua-1-phunutoday_vn.jpg","This is description"));
-//        notificationList.add(new Notification("Title","http://media.phunutoday.vn/files/upload_images/2015/11/10/cach-lam-banh-da-cua-1-phunutoday_vn.jpg","This is description"));
-//        notificationList.add(new Notification("Title","http://media.phunutoday.vn/files/upload_images/2015/11/10/cach-lam-banh-da-cua-1-phunutoday_vn.jpg","This is description"));
-//        NotificationAdapter notificationAdapter = new NotificationAdapter(notificationList,getContext());
-//        recyclerView.setAdapter(notificationAdapter);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
     }
 
 
@@ -123,9 +110,15 @@ public class NotificationFragment extends Fragment {
             }
 
             @Override
-            protected void populateViewHolder(NotificationViewHolder viewHolder, Order model, int position) {
-                Log.d(TAG, " my history " + model.getFoodImgLink());
+            protected void populateViewHolder(NotificationViewHolder viewHolder, final Order model, int position) {
                 viewHolder.loadData(getContext(), model);
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(getContext(), FoodDetailActivity.class).putExtra("post", model.getPostId());
+                        startActivity(intent);
+                    }
+                });
 
             }
         };

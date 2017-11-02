@@ -23,6 +23,7 @@ public class Order implements Serializable {
     private String type;
     private String time;
     private String status;
+    private String postId;
 
     public Order() {
     }

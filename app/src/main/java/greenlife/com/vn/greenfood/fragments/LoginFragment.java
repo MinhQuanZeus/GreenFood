@@ -95,6 +95,12 @@ public class LoginFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         setupUI(view);
         AccountKit.logOut();
+        SharedPreferences pre = getActivity().getSharedPreferences(prefname, MODE_PRIVATE);
+        boolean isLogin = pre.getBoolean("isLogin",false);
+        if(isLogin){
+            Intent intent = new Intent(getContext(), MainActivity.class);
+            startActivity(intent);
+        }
         return view;
     }
 

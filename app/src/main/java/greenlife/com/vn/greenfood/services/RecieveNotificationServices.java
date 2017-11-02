@@ -22,7 +22,6 @@ import greenlife.com.vn.greenfood.R;
 import greenlife.com.vn.greenfood.activities.MainActivity;
 import greenlife.com.vn.greenfood.models.User;
 import greenlife.com.vn.greenfood.network.models.order.Order;
-import greenlife.com.vn.greenfood.utils.FirebaseUntils;
 import greenlife.com.vn.greenfood.utils.LibrarySupportManager;
 
 /**
@@ -81,6 +80,7 @@ public class RecieveNotificationServices extends FirebaseMessagingService {
         newPost.child("foodImgLink").setValue(order.getFoodImgLink());
         newPost.child("time").setValue(order.getTime());
         newPost.child("status").setValue("Unchecked");
+        newPost.child("postId").setValue(order.getPostId());
 
 
 

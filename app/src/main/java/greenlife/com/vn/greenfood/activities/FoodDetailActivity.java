@@ -395,7 +395,7 @@ public class FoodDetailActivity extends AppCompatActivity {
                 Log.d(TAG, "token ID : " + user.getTokenID());
                 final String now = LibrarySupportManager.getInstance().currentDateTime();
                 if(post != null){
-                    order = new Order(firebaseAuth.getCurrentUser().getUid(),buyer.getName(),post.getUserID(),post.getTitle(), post.getImage(),"order",now,"order");
+                    order = new Order(firebaseAuth.getCurrentUser().getUid(),buyer.getName(),post.getUserID(),post.getTitle(), post.getImage(),"order",now,"order",post.getId());
                 }
 
                 Log.d(TAG, "my order : " + order.toString());

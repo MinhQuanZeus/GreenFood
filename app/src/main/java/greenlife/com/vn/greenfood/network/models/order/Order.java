@@ -5,8 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 
-
-public class Order implements Serializable{
+public class Order implements Serializable {
     @SerializedName("buyer_id")
     private String buyerID;
     @SerializedName("buyer_name")
@@ -20,11 +19,12 @@ public class Order implements Serializable{
     private String type;
     private String time;
     private String status;
+    private String postId;
 
     public Order() {
     }
 
-    public Order(String buyerID, String buyerName, String sellerID, String foodName, String foodImgLink, String type, String time, String status) {
+    public Order(String buyerID, String buyerName, String sellerID, String foodName, String foodImgLink, String type, String time, String status, String postId) {
         this.buyerID = buyerID;
         this.buyerName = buyerName;
         this.sellerID = sellerID;
@@ -33,6 +33,7 @@ public class Order implements Serializable{
         this.type = type;
         this.time = time;
         this.status = status;
+        this.postId = postId;
     }
 
     public Order(String buyerID, String sellerID, String foodName, String foodImgLink, String type, String time, String status) {
@@ -76,6 +77,10 @@ public class Order implements Serializable{
 
     public String getBuyerName() {
         return buyerName;
+    }
+
+    public String getPostId() {
+        return postId;
     }
 
     @Override

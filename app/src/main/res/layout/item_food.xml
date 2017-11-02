@@ -152,16 +152,6 @@
                 android:layout_toEndOf="@id/rating_bar"
                 android:layout_below="@+id/tv_username"
                 android:layout_marginStart="3dp"/>
-
-            <ImageView
-                android:id="@+id/imageView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/rating_bar"
-                android:layout_alignParentEnd="true"
-                android:paddingEnd="10dp"
-                app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
-
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 </RelativeLayout>
