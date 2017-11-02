@@ -157,8 +157,6 @@ public class FoodDetailActivity extends AppCompatActivity {
                     break;
                 }
 
-                post =  dataSnapshot.getValue(Post.class);
-
                 if(post != null){
                     tvPostTime.setText(post.getTime());
                     Picasso.with(FoodDetailActivity.this)
