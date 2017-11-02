@@ -146,8 +146,21 @@ public class FoodDetailActivity extends AppCompatActivity {
 
     private void loadData() {
         Intent intent = getIntent();
-        post = (Post) intent.getSerializableExtra("post");
+        String postID = (String) intent.getSerializableExtra("postID");
+        DatabaseReference databaseReference;
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("post").orderByChild("id").equalTo(postID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                post = dataSnapshot.getValue(Post.class);
 
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         tvPostTime.setText(post.getTime());
       // User user = MapsUltils.getUser(this, post.getUserID());
         Picasso.with(this)
@@ -227,7 +240,7 @@ public class FoodDetailActivity extends AppCompatActivity {
                 } else {
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     RatingDialogFragment ratingBarFragment = RatingDialogFragment.getInstant();
-                    ratingBarFragment.setData(post ,firebaseAuth.getCurrentUser().getUid());
+                    ratingBarFragment.setData( post.getId() ,firebaseAuth.getCurrentUser().getUid());
                     ratingBarFragment.show(fragmentManager, "dialog");
                 }
 
