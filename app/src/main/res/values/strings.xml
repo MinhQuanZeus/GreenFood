@@ -65,6 +65,4 @@
     <string name="notification_push">new notification</string>
     <string name="rating_label">Đánh Gía</string>
     <string name="call_phone">Gọi</string>
-
-    call_phone
 </resources>

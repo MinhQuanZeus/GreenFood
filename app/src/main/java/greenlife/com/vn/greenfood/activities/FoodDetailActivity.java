@@ -186,6 +186,19 @@ public class FoodDetailActivity extends AppCompatActivity {
                     tvPrice.setText(formatNumber(post.getPrice()));
                     tvAddress.setText(post.getAddress());
                     ratingBar.setRating(post.getRateAvgRating());
+                    tvUserName.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            redirectToProfile((String)view.getTag());
+                        }
+                    });
+                    ivAvatar.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            redirectToProfile((String)view.getTag());
+                        }
+                    });
+                }
 
                     //xu ly get so dien thoai
                     post.getUserID();
@@ -215,16 +228,14 @@ public class FoodDetailActivity extends AppCompatActivity {
                     });
 
                 }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
         });
        //  User user = MapsUltils.getUser(this, post.getUserID());
 
+    }
+    private void redirectToProfile(String uid){
+        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+        intent.putExtra("userId", uid);
+        startActivity(intent);
     }
 
     private void showLocation(final String destination) {
@@ -332,8 +343,8 @@ public class FoodDetailActivity extends AppCompatActivity {
                 }
 
             }
-        })
-        ;
+        });
+
         // Handle Button rating
         btn_rating.setOnClickListener(new View.OnClickListener() {
             @Override
