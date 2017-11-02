@@ -235,7 +235,7 @@ public class RegisterFragment extends Fragment {
                 }
             });
         }else{
-            mDatabaseReference.child("avatar").setValue("https://www.google.com.vn/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwj4gNqj4Z3XAhWDk5QKHeZsBi4QjRwIBw&url=http%3A%2F%2Fwww.limestone.edu%2Facademics%2Ffaculty%2Fann-wyatt&psig=AOvVaw2X5Gm-n8UPbIatONQ5O0BD&ust=1509638868216014");
+            mDatabaseReference.child("avatar").setValue("http://www.limestone.edu/sites/default/files/user.png");
         }
 
     }
