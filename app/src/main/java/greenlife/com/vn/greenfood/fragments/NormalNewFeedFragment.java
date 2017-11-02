@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,7 +50,7 @@ import retrofit2.Response;
 import static android.content.ContentValues.TAG;
 
 
-public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragment.Callbacks{
+public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragment.Callbacks {
 
     private static final String NO_INTERNET_CONNECTION = "Vui lòng kiểm tra lại kết nối mạng";
     private RecyclerView rvNewFeed;
@@ -71,7 +72,7 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
         updateNewFeedByQuery(query);
     }
 
-    public void updateNewFeedByQuery(Query query){
+    public void updateNewFeedByQuery(Query query) {
         firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Post, PostViewHolder>(
                 Post.class,
                 R.layout.item_food,
@@ -80,7 +81,7 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
         ) {
             @Override
             public Post getItem(int position) {
-                return super.getItem(getItemCount() - (position+1));
+                return super.getItem(getItemCount() - (position + 1));
             }
 
             @Override
@@ -91,8 +92,8 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(getContext(), FoodDetailActivity.class).putExtra("postId",model.getId());
-                        Log.d("Detail","Des: "+model.getDescription());
+                        Intent intent = new Intent(getContext(), FoodDetailActivity.class).putExtra("post", model);
+                        Log.d("Detail", "Des: " + model.getDescription());
                         startActivity(intent);
                     }
                 });
@@ -102,7 +103,7 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
     }
 
 
-    public static class PostViewHolder extends RecyclerView.ViewHolder{
+    public static class PostViewHolder extends RecyclerView.ViewHolder {
         private TextView tvFoodName;
         private TextView tvPrice;
         private ImageView ivFood;
@@ -112,7 +113,10 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
         private TextView tvDistance;
         private TextView tvDescription;
         private String distance;
+        private TextView tvTotalRate;
+        private RatingBar ratingBar;
         View itemView;
+
         public PostViewHolder(View itemView) {
             super(itemView);
             this.itemView = itemView;
@@ -131,9 +135,11 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
             ivUser = itemView.findViewById(R.id.iv_avatar);
             tvDistance = itemView.findViewById(R.id.tv_distance);
             tvDescription = itemView.findViewById(R.id.tv_description);
+            tvTotalRate = itemView.findViewById(R.id.tv_totalRate);
+            ratingBar = itemView.findViewById(R.id.rating_bar);
         }
 
-        private void loadData(Context context, Post post){
+        private void loadData(Context context, Post post) {
             //1. Load title(food name), description, price
             tvFoodName.setText(post.getTitle());
             tvPrice.setText(
@@ -141,6 +147,8 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
                             .getInstance()
                             .formatCurrency(post.getPrice())
             );
+            ratingBar.setRating(post.getRateAvgRating());
+            tvTotalRate.setText("(" + post.getNumberRatePeople() + ")");
 
             //get distance
             getDistanceFromLocation("22C Thành Công, Khu tập thể Bắc Thành Công, Thành Công, Ba Đình, Hà Nội, Vietnam", post.getAddress());
@@ -156,27 +164,27 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
 //            Log.d("New feed:","Time ago: "+ DateTimeUntils.toRelative(LibrarySupportManager.convertStringToDate(post.getTime()),new Date()));
 
             //3. Load Post Owner
-            if(post.getUserID() != null) {
+            if (post.getUserID() != null) {
                 getUser(context, post.getUserID());
             }
         }
 
-        private String getDistanceFromLocation(String current, final String destinate){
+        private String getDistanceFromLocation(String current, final String destinate) {
             GetDistanceService getDistanceService = RetrofitFactory.getInstance("https://developers.google.com/maps/")
                     .createService(GetDistanceService.class);
             getDistanceService.getDistance("imperial", current, destinate, "AIzaSyBs7LWRp7vadlOd79qe_c01BTwRw_KF5VE")
                     .enqueue(new Callback<MainObject>() {
                         @Override
                         public void onResponse(Call<MainObject> call, Response<MainObject> response) {
-                            if(response.code() == 200){
+                            if (response.code() == 200) {
                                 String statusGoogleAPI = response.body()
                                         .getStatusGoogleAPI();
-                                if(statusGoogleAPI.equals("OK")) {
+                                if (statusGoogleAPI.equals("OK")) {
                                     String status = response.body()
                                             .getRows().get(0)
                                             .getElements().get(0)
                                             .getStatus();
-                                    if(status.equals("OK")){
+                                    if (status.equals("OK")) {
                                         distance = response.body()
                                                 .getRows().get(0)
                                                 .getElements().get(0)
@@ -186,7 +194,7 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
                                 } else distance = "";
                                 tvDistance.setText(LibrarySupportManager.getInstance().distanceFromLocationFormat(distance));
                             }
-                            Log.d(TAG,"distance : "+distance);
+                            Log.d(TAG, "distance : " + distance);
                         }
 
                         @Override
@@ -233,7 +241,7 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
     }
 
     private void checkConnection() {
-        if(!NetworkConnectionSupport.isConnected()){
+        if (!NetworkConnectionSupport.isConnected()) {
             Toast.makeText(getContext(), NO_INTERNET_CONNECTION, Toast.LENGTH_SHORT).show();
         }
     }
@@ -247,8 +255,8 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
     private void setupUI(View view) {
         rvNewFeed = view.findViewById(R.id.rv_newfeed);
         rvNewFeed.setHasFixedSize(true);
-        ivLoading = (SpinKitView)view.findViewById(R.id.iv_loading);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),1,GridLayoutManager.VERTICAL,false);
+        ivLoading = (SpinKitView) view.findViewById(R.id.iv_loading);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1, GridLayoutManager.VERTICAL, false);
         rvNewFeed.setLayoutManager(gridLayoutManager);
     }
 
@@ -260,18 +268,21 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
 
     @Override
     public void onResult(Object result) {
-        HashMap<String, FilterTag> applied_filters = (HashMap<String, FilterTag>) result;
+        HashMap<String, Integer> applied_filters = (HashMap<String, Integer>) result;
         Log.v("Tungds", applied_filters.toString());
-        if (applied_filters.get("time")!=null){
-            int periodTime = applied_filters.get("time").getValue();
-            Query query = null;
-            if (periodTime<= 12){
-                String dateString = LibrarySupportManager.getDateString(new Date(new Date().getTime() - periodTime*60*60*1000));
-                query = databaseReference.orderByChild("time").startAt(dateString);
-            }else{
-                query = databaseReference.orderByChild("time");
+        loadData();
+        Query query = databaseReference.orderByChild("time");
+        if (applied_filters.get("time") != null) {
+            int periodTime = applied_filters.get("time");
+            if (periodTime <= 12) {
+                String dateString = LibrarySupportManager.getDateString(new Date(new Date().getTime() - periodTime * 60 * 60 * 1000));
+                query.startAt(dateString);
             }
-            updateNewFeedByQuery(query);
+        } else if (applied_filters.get("rating") != null) {
+            int minRate = applied_filters.get("rating");
+            int maxRate = minRate + 1;
+            query = databaseReference.orderByChild("rateAvgRating").startAt(minRate).endAt(maxRate);
         }
+        updateNewFeedByQuery(query);
     }
 }
