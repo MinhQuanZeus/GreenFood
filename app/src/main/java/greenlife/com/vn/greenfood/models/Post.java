@@ -16,15 +16,14 @@ public class Post implements Serializable {
     private String time;
     private String image;
     private String address;
-    private long quantity;
-    private int numberRatePeople;
-    private double rateAvgRating;
+    private long numberRatePeople;
+    private float rateAvgRating;
 
 
 
 
 
-    public Post(String id, String userID, String title, String description, long price, String time, String image, String address, long quantity, int numberRatePeople, double rateAvgRating) {
+    public Post(String id, String userID, String title, String description, long price, String time, String image, String address, long numberRatePeople, float rateAvgRating) {
         this.id = id;
         this.userID = userID;
         this.title = title;
@@ -122,19 +121,19 @@ public class Post implements Serializable {
     }
 
 
-    public void setNumberRatePeople(int numberRatePeople) {
+    public void setNumberRatePeople(long numberRatePeople) {
         this.numberRatePeople = numberRatePeople;
     }
 
-    public void setRateAvgRating(double rateAvgRating) {
+    public void setRateAvgRating(float rateAvgRating) {
         this.rateAvgRating = rateAvgRating;
     }
 
-    public int getNumberRatePeople() {
+    public long getNumberRatePeople() {
         return numberRatePeople;
     }
 
-    public double getRateAvgRating() {
+    public float getRateAvgRating() {
         return rateAvgRating;
     }
 }

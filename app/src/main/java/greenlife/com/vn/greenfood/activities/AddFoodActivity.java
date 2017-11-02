@@ -206,8 +206,8 @@ public class AddFoodActivity extends AppCompatActivity {
                                 newPost.child(FIREBASE_POST_ADDRESS).setValue(etFoodAddress.getText().toString());
                                 newPost.child(FIREBASE_POST_TIME).setValue(LibrarySupportManager.currentDateTime());
                                 newPost.child(FIREBASE_POST_USERID).setValue(firebaseAuth.getCurrentUser().getUid());
-                                newPost.child(NUMBER_RATE_PEOPLE).setValue("0");
-                                newPost.child(RATE_AVG_RATING).setValue("0");
+                                newPost.child(NUMBER_RATE_PEOPLE).setValue(0);
+                                newPost.child(RATE_AVG_RATING).setValue(0);
                                 //post image
                                 //  ivAddFoodImage.setDrawingCacheEnabled(true);
                                 //  ivAddFoodImage.buildDrawingCache();

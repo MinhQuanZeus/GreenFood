@@ -4,16 +4,16 @@ package greenlife.com.vn.greenfood.models;
  * Created by thean on 11/2/2017.
  */
 
-public class UserPost {
+public class UserRatePost {
 
     private String id;
     private String idUser;
     private String idPost;
 
 
-    private double rate;
+    private long rate;
 
-    public UserPost(String id, String idUser, String idPost, double rate) {
+    public UserRatePost(String id, String idUser, String idPost, long rate) {
         this.id = id;
         this.idUser = idUser;
         this.idPost = idPost;
@@ -44,11 +44,11 @@ public class UserPost {
         this.idPost = idPost;
     }
 
-    public double getRate() {
+    public long getRate() {
         return rate;
     }
 
-    public void setRate(double rate) {
+    public void setRate(long rate) {
         this.rate = rate;
     }
 }

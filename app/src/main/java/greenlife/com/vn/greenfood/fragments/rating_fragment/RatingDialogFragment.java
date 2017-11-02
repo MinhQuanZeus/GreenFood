@@ -19,14 +19,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import greenlife.com.vn.greenfood.R;
-import greenlife.com.vn.greenfood.activities.AddFoodActivity;
 import greenlife.com.vn.greenfood.models.Post;
 import greenlife.com.vn.greenfood.models.User;
-import greenlife.com.vn.greenfood.models.UserPost;
-import jp.wasabeef.picasso.transformations.CropCircleTransformation;
+import greenlife.com.vn.greenfood.models.UserRatePost;
 
 
 /**
@@ -38,10 +37,12 @@ public class RatingDialogFragment extends DialogFragment {
     Button getRating;
 
     private  DatabaseReference databaseReference;
+
+    private StorageReference mStorageReference;
     private Post post ;
     private String user_Current_Id;
 
-    private UserPost cur_userpost;
+    private UserRatePost cur_userpost;
 
     private User userSeller;
 
@@ -49,6 +50,7 @@ public class RatingDialogFragment extends DialogFragment {
 
     public static RatingDialogFragment getInstant(){
         if(ratingDialogFragment == null){
+
             ratingDialogFragment = new RatingDialogFragment();
         }
         return  ratingDialogFragment;
@@ -78,8 +80,8 @@ public class RatingDialogFragment extends DialogFragment {
         @Override
         public void onClick(View view) {
             //RatingBar$getRating() returns float value, you should cast(convert) it to string to display in a view
-            double rating = ratingBar.getRating();
-
+            long rating = (long)ratingBar.getRating();
+            databaseReference = FirebaseDatabase.getInstance().getReference();
             if(!isNetworkAvailable()){
                 Toast.makeText(getContext(), "Không có Internet", Toast.LENGTH_SHORT).show();
             }else {
@@ -91,8 +93,8 @@ public class RatingDialogFragment extends DialogFragment {
                 getPostUserCurrent(getContext(), post.getId(), user_Current_Id);
 
                 if (cur_userpost == null) {
-                    double sum = post.getNumberRatePeople() * post.getRateAvgRating() + rating;
-                    double avrRate = sum / (post.getNumberRatePeople() + 1);
+                    float sum = post.getNumberRatePeople() * post.getRateAvgRating() + rating;
+                    float avrRate = sum / (post.getNumberRatePeople() + 1);
 
                     post.setRateAvgRating(avrRate);
                     post.setNumberRatePeople(post.getNumberRatePeople() + 1);
@@ -100,7 +102,7 @@ public class RatingDialogFragment extends DialogFragment {
                     //add userpost
 
                     updatePost();
-                    pushUserpost();
+                    pushUserpost(rating);
                     updateUserseller();
 
 
@@ -116,7 +118,7 @@ public class RatingDialogFragment extends DialogFragment {
                     //add userpost
 
                         updatePost();
-                        pushUserpost();
+                        pushUserpost(rating);
                         updateUserseller();
 
                 }
@@ -127,6 +129,7 @@ public class RatingDialogFragment extends DialogFragment {
                 //UPDATE USER
 
             }
+            Toast.makeText(getContext(), "Thành công ! Cám ơn sự đánh giá của bạn", Toast.LENGTH_SHORT).show();
                 ratingDialogFragment.dismiss();
 
         }
@@ -135,16 +138,34 @@ public class RatingDialogFragment extends DialogFragment {
     private void updateUserseller() {
     }
 
-    private void pushUserpost() {
+    private void pushUserpost(double rating) {
+        DatabaseReference mDatabaseReference;
+
+        mDatabaseReference = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("userrateposts");
+        String key = mDatabaseReference.push().getKey();
+
+        mStorageReference = FirebaseStorage.getInstance()
+                .getReference()
+                .child(key);
+
+        databaseReference = mDatabaseReference.push();
+
+        databaseReference.child("idUser").setValue(user_Current_Id);
+        databaseReference.child("idPost").setValue(post.getId()+"");
+        databaseReference.child("rate").setValue(rating);
 
     }
 
     private void updatePost() {
+        databaseReference.child("post").child(post.getId()).child("numberRatePeople").setValue(post.getNumberRatePeople() + "");
+        databaseReference.child("post").child(post.getId()).child("rateAvgRating").setValue(post.getRateAvgRating() + "");
     }
 
 
     private void getUser(final Context context, String userID) {
-        databaseReference = FirebaseDatabase.getInstance().getReference();
+
         databaseReference.child("users")
                 .child(userID)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -186,7 +207,7 @@ public class RatingDialogFragment extends DialogFragment {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        cur_userpost = dataSnapshot.getValue(UserPost.class);
+                        cur_userpost = dataSnapshot.getValue(UserRatePost.class);
 
                     }
 
