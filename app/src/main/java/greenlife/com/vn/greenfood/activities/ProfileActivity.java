@@ -71,7 +71,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         description = (TextView)findViewById(R.id.tv_description);
         link = (TextView)findViewById(R.id.tv_link);
         noPost = (TextView)findViewById(R.id.tv_NoPost);
-        noFollow = (TextView)findViewById(R.id.tv_NoFollow);
         change_setting = (LinearLayout) findViewById(R.id.ln_edit_profile);
         btn_fixInfor = (TextView)findViewById(R.id.btn_fixInfor);
         rvNewFeed = findViewById(R.id.rv_image_food);
@@ -84,7 +83,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         }
         else {
             getUser(this,defineUser);
-            change_setting.setVisibility(View.INVISIBLE);
+            change_setting.setVisibility(View.VISIBLE);
         }
         noPost.setText(postCount+"");
         btn_fixInfor.setOnClickListener(this);
