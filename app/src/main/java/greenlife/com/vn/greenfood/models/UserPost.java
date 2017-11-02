@@ -6,31 +6,49 @@ package greenlife.com.vn.greenfood.models;
 
 public class UserPost {
 
-    private int id;
-    private int idUser;
-    private int idPost;
+    private String id;
+    private String idUser;
+    private String idPost;
+
+
     private double rate;
 
-    public UserPost(int id, int idUser, int idPost, double rate) {
+    public UserPost(String id, String idUser, String idPost, double rate) {
         this.id = id;
         this.idUser = idUser;
         this.idPost = idPost;
         this.rate = rate;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public int getIdUser() {
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getIdUser() {
         return idUser;
     }
 
-    public int getIdPost() {
+    public void setIdUser(String idUser) {
+        this.idUser = idUser;
+    }
+
+    public String getIdPost() {
         return idPost;
+    }
+
+    public void setIdPost(String idPost) {
+        this.idPost = idPost;
     }
 
     public double getRate() {
         return rate;
+    }
+
+    public void setRate(double rate) {
+        this.rate = rate;
     }
 }

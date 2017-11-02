@@ -18,9 +18,13 @@ public class Post implements Serializable {
     private String address;
     private long quantity;
     private int numberRatePeople;
-    private int rateAvgRating;
+    private double rateAvgRating;
 
-    public Post(String id, String userID, String title, String description, long price, String time, String image, String address, long quantity, int numberRatePeople, int rateAvgRating) {
+
+
+
+
+    public Post(String id, String userID, String title, String description, long price, String time, String image, String address, long quantity, int numberRatePeople, double rateAvgRating) {
         this.id = id;
         this.userID = userID;
         this.title = title;
@@ -29,12 +33,11 @@ public class Post implements Serializable {
         this.time = time;
         this.image = image;
         this.address = address;
-        this.quantity = quantity;
         this.numberRatePeople = numberRatePeople;
         this.rateAvgRating = rateAvgRating;
     }
 
-    public Post(String id, String userID, String title, String description, long price, String time, String image, String address, long quantity) {
+    public Post(String id, String userID, String title, String description, long price, String time, String image, String address) {
         this.id = id;
         this.userID = userID;
         this.title = title;
@@ -43,7 +46,6 @@ public class Post implements Serializable {
         this.time = time;
         this.image = image;
         this.address = address;
-        this.quantity = quantity;
     }
 
     public Post() {
@@ -119,8 +121,21 @@ public class Post implements Serializable {
         return address;
     }
 
-    public long getQuantity() {
-        return quantity;
+
+    public void setNumberRatePeople(int numberRatePeople) {
+        this.numberRatePeople = numberRatePeople;
+    }
+
+    public void setRateAvgRating(double rateAvgRating) {
+        this.rateAvgRating = rateAvgRating;
+    }
+
+    public int getNumberRatePeople() {
+        return numberRatePeople;
+    }
+
+    public double getRateAvgRating() {
+        return rateAvgRating;
     }
 }
 

@@ -206,7 +206,13 @@ public class FoodDetailActivity extends AppCompatActivity {
         btnOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendOrderNotificationMessage();
+
+                if(post.getUserID().compareToIgnoreCase(firebaseAuth.getCurrentUser().getUid())==0){
+                    Toast.makeText(FoodDetailActivity.this, "Bạn không thể đặt hàng chính sản phẩm của mình ", Toast.LENGTH_SHORT).show();
+                } else {
+                    sendOrderNotificationMessage();
+                }
+
             }
         });
 
@@ -215,10 +221,16 @@ public class FoodDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //Show rating dialog
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                RatingDialogFragment ratingBarFragment = RatingDialogFragment.getInstant();
-                ratingBarFragment.setData(post ,firebaseAuth.getCurrentUser().getUid());
-                ratingBarFragment.show(fragmentManager, "dialog");
+
+                if(post.getUserID().compareToIgnoreCase(firebaseAuth.getCurrentUser().getUid())==0){
+                    Toast.makeText(FoodDetailActivity.this, "Bạn không thể tự đánh giá mình ", Toast.LENGTH_SHORT).show();
+                } else {
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    RatingDialogFragment ratingBarFragment = RatingDialogFragment.getInstant();
+                    ratingBarFragment.setData(post ,firebaseAuth.getCurrentUser().getUid());
+                    ratingBarFragment.show(fragmentManager, "dialog");
+                }
+
             }
         });
     }
