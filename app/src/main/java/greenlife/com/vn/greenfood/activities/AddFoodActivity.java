@@ -78,7 +78,6 @@ public class AddFoodActivity extends AppCompatActivity {
     private static final String FIREBASE_POST_TITLE = "title";
     private static final String FIREBASE_POST_DESCRIPTION = "description";
     private static final String FIREBASE_POST_PRICE = "price";
-    private static final String FIREBASE_POST_QUANTITY = "quantity";
     private static final String FIREBASE_POST_ADDRESS = "address";
     private static final String FIREBASE_POST_TIME = "time";
     private static final String FIREBASE_POST_IMAGE = "image";
@@ -87,7 +86,6 @@ public class AddFoodActivity extends AppCompatActivity {
     private static final String INVALID_FOOD_NAME_MESSAGE = "Bạn phải tên món ăn";
     private static final String INVALID_FOOD_DESCRIPTION_MESSAGE = "Bạn phải nhập thông tin về món ăn";
     private static final String INVALID_FOOD_PRICE_MESSAGE = "Bạn phải nhập giá";
-    private static final String INVALID_FOOD_QUANTITY_MESSAGE = "Bạn phải nhập số lượng";
     private static final String INVALID_FOOD_ADDRESS_MESSAGE = "Bạn phải nhập địa chỉ ";
     private static final String INVALID_FOOD_PHOTO = "Bạn phải chọn ảnh của món ăn";
     private static final String WRONG_ADDRESS_MESSAGE = "Địa chỉ bạn vừa nhập không hợp lệ";
@@ -95,6 +93,9 @@ public class AddFoodActivity extends AppCompatActivity {
     private static final String TAG = AddFoodActivity.class.toString();
     private static final String BLANK_INPUT_IMAGE = "Bạn phải chọn ảnh của món ăn";
     private static final String NO_INTERNET_CONNECTION = "Kiểm tra lại kết nối mạng";
+    private static final String NUMBER_RATE_PEOPLE = "numberRatePeople";
+    private static final String RATE_AVG_RATING = "rateAvgRating";
+
 
     public static String DEBUG_TAG = "AppCompatActivity";
     private static final int THUMBNAIL_SIZE = 150;
@@ -119,7 +120,6 @@ public class AddFoodActivity extends AppCompatActivity {
     private EditText etFoodName;
     private EditText etDescription;
     private EditText etFoodPrice;
-    private EditText etFoodQuantity;
     private EditText etFoodAddress;
     private Toolbar toolbar;
     private ProgressDialog progressDialog;
@@ -203,11 +203,11 @@ public class AddFoodActivity extends AppCompatActivity {
                                 newPost.child(FIREBASE_POST_TITLE).setValue(etFoodName.getText().toString());
                                 newPost.child(FIREBASE_POST_DESCRIPTION).setValue(etDescription.getText().toString());
                                 newPost.child(FIREBASE_POST_PRICE).setValue(Long.parseLong(etFoodPrice.getText().toString().replaceAll("[₫,. ]", "")));
-                                newPost.child(FIREBASE_POST_QUANTITY).setValue(Long.parseLong(etFoodQuantity.getText().toString()));
                                 newPost.child(FIREBASE_POST_ADDRESS).setValue(etFoodAddress.getText().toString());
                                 newPost.child(FIREBASE_POST_TIME).setValue(LibrarySupportManager.currentDateTime());
                                 newPost.child(FIREBASE_POST_USERID).setValue(firebaseAuth.getCurrentUser().getUid());
-
+                                newPost.child(NUMBER_RATE_PEOPLE).setValue("0");
+                                newPost.child(RATE_AVG_RATING).setValue("0");
                                 //post image
                                 //  ivAddFoodImage.setDrawingCacheEnabled(true);
                                 //  ivAddFoodImage.buildDrawingCache();
@@ -265,8 +265,6 @@ public class AddFoodActivity extends AppCompatActivity {
             etFoodName.setError(null);
             etDescription.setText("");
             etDescription.setError(null);
-            etFoodQuantity.setText(null);
-            etFoodQuantity.setError(null);
             etFoodPrice.setText("₫ 0");
             etFoodPrice.setError(null);
             etFoodAddress.setText("");
@@ -288,7 +286,6 @@ public class AddFoodActivity extends AppCompatActivity {
         return (!etFoodName.getText().toString().isEmpty()
                 && !etDescription.getText().toString().isEmpty()
                 && !etFoodPrice.getText().toString().isEmpty()
-                && !etFoodQuantity.getText().toString().isEmpty()
                 && !etFoodAddress.getText().toString().isEmpty());
     }
 
@@ -343,30 +340,6 @@ public class AddFoodActivity extends AppCompatActivity {
 
             }
         });
-        etFoodQuantity.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (!ValidateInput
-                        .checkStringLength(etFoodQuantity.getText().toString(), INVALID_FOOD_QUANTITY_MESSAGE)
-                        .equals("")) {
-                    etFoodQuantity.setError(INVALID_FOOD_QUANTITY_MESSAGE);
-                }
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (!ValidateInput
-                        .checkStringLength(etFoodQuantity.getText().toString(), INVALID_FOOD_QUANTITY_MESSAGE)
-                        .equals("")) {
-                    etFoodQuantity.setError(INVALID_FOOD_QUANTITY_MESSAGE);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
         etFoodAddress.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -394,7 +367,6 @@ public class AddFoodActivity extends AppCompatActivity {
         return (etFoodName.getError() == null
                 && etDescription.getError() == null
                 && etFoodPrice.getError() == null
-                && etFoodQuantity.getError() == null
                 && etFoodAddress.getError() == null
         );
     }
@@ -447,7 +419,6 @@ public class AddFoodActivity extends AppCompatActivity {
         etFoodName = (EditText) findViewById(R.id.et_full_name);
         etDescription = (EditText) findViewById(R.id.et_email);
         etFoodPrice = (EditText) findViewById(R.id.et_password);
-        etFoodQuantity = (EditText) findViewById(R.id.et_confirm_password);
         etFoodAddress = (EditText) findViewById(R.id.et_address);
         etFoodPrice.addTextChangedListener(new MoneyTextWatcher(etFoodPrice));
         etFoodPrice.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});

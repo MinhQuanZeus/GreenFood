@@ -1,5 +1,6 @@
 package greenlife.com.vn.greenfood.activities;
 
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -36,6 +37,7 @@ import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import greenlife.com.vn.greenfood.fragments.rating_fragment.RatingDialogFragment;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -70,17 +72,14 @@ public class FoodDetailActivity extends AppCompatActivity {
     private TextView tvFoodTitle;
     private TextView tvAddress;
     private TextView tvPrice;
-    private TextView tvQuantity;
     private TextView tvDescription;
     private ImageView ivAvatar;
     private ImageView ivFood;
     private RatingBar ratingBar;
 
     private Button btnOrder;
-    private EditText etQuantity;
     private TextView tvFoodName;
-    private Button btnSub;
-    private Button btnAdd;
+    private Button btn_rating;
 
 
     @Override
@@ -89,10 +88,11 @@ public class FoodDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_food_detail);
         firebaseAuth = FirebaseAuth.getInstance();
         setupUI();
-        DefiniteQuantity();
         getOrder();
         onReceiverOrder();
     }
+
+
 
     private void onReceiverOrder() {
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
@@ -114,26 +114,6 @@ public class FoodDetailActivity extends AppCompatActivity {
         };
     }
 
-    private void DefiniteQuantity() {
-        btnSub.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!etQuantity.getText().toString().equals("1")){
-                    etQuantity.setText(String.valueOf(Integer.parseInt(etQuantity.getText().toString()) - 1));
-                }
-            }
-        });
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(Integer.valueOf(etQuantity.getText().toString()) < post.getQuantity()){
-                    etQuantity.setText(String.valueOf(Integer.valueOf(etQuantity.getText().toString()) + 1));
-                }
-            }
-        });
-        tvPrice.setText(String.valueOf(Integer.parseInt(etQuantity.getText().toString()) * post.getPrice()));
-    }
-
     private void setupUI() {
         tvPostTime = (TextView) findViewById(R.id.tv_current_time);
         tvDistance = (TextView) findViewById(R.id.tv_distance);
@@ -141,19 +121,15 @@ public class FoodDetailActivity extends AppCompatActivity {
         tvFoodTitle = (TextView) findViewById(R.id.tv_food_name);
         tvAddress = (TextView) findViewById(R.id.tv_address);
         tvPrice = (TextView) findViewById(R.id.tv_price);
-        tvQuantity = (TextView) findViewById(R.id.tv_food_avaiable);
         tvDescription = (TextView) findViewById(R.id.tv_description);
         ivAvatar = (ImageView) findViewById(R.id.iv_avatar);
         ivFood = (ImageView) findViewById(R.id.iv_food);
         ratingBar = (RatingBar) findViewById(R.id.rating_bar);
+        btn_rating = (Button) findViewById(R.id.btn_rating);
 
         //for send order
         btnOrder = (Button) findViewById(R.id.btn_order);
-        etQuantity = (EditText) findViewById(R.id.editText);
         tvFoodName = (TextView) findViewById(R.id.tv_food_name);
-        btnSub = (Button) findViewById(R.id.button2);
-        btnAdd = (Button) findViewById(R.id.button3);
-
         toolbar = (Toolbar) findViewById(R.id.tb_main);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
@@ -173,7 +149,7 @@ public class FoodDetailActivity extends AppCompatActivity {
         post = (Post) intent.getSerializableExtra("post");
 
         tvPostTime.setText(post.getTime());
-//        User user = MapsUltils.getUser(this, post.getUserID());
+      // User user = MapsUltils.getUser(this, post.getUserID());
         Picasso.with(this)
                 .load(post.getImage())
                 .into(ivFood);
@@ -184,7 +160,6 @@ public class FoodDetailActivity extends AppCompatActivity {
         tvDescription.setText(post.getDescription());
         tvFoodName.setText((post.getTitle()));
         tvPrice.setText(formatNumber(post.getPrice()));
-        tvQuantity.setText(post.getQuantity() + "");
         tvAddress.setText(post.getAddress());
     }
 
@@ -227,10 +202,23 @@ public class FoodDetailActivity extends AppCompatActivity {
     }
 
     private void getOrder() {
+        //Handle Order Button
         btnOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sendOrderNotificationMessage();
+            }
+        });
+
+        // Handle Button rating
+        btn_rating.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Show rating dialog
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                RatingDialogFragment ratingBarFragment = RatingDialogFragment.getInstant();
+                ratingBarFragment.setData(post ,firebaseAuth.getCurrentUser().getUid());
+                ratingBarFragment.show(fragmentManager, "dialog");
             }
         });
     }
@@ -256,7 +244,6 @@ public class FoodDetailActivity extends AppCompatActivity {
                             post.getUserID(),
                             tvFoodName.getText().toString(),
                             post.getImage(),
-                            Integer.valueOf(etQuantity.getText().toString()),
                             "order",
                             now
                     );
@@ -293,7 +280,6 @@ public class FoodDetailActivity extends AppCompatActivity {
                                     newPost.child("type").setValue("request");
                                     newPost.child("sellerID").setValue(post.getUserID());
                                     newPost.child("foodName").setValue(post.getTitle());
-                                    newPost.child("quantity").setValue(Integer.valueOf(etQuantity.getText().toString()));
                                     newPost.child("time").setValue(now);
                                     newPost.child("foodImgLink").setValue(post.getImage());
                                     newPost.child("status").setValue("waiting");

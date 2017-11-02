@@ -17,6 +17,22 @@ public class Post implements Serializable {
     private String image;
     private String address;
     private long quantity;
+    private int numberRatePeople;
+    private int rateAvgRating;
+
+    public Post(String id, String userID, String title, String description, long price, String time, String image, String address, long quantity, int numberRatePeople, int rateAvgRating) {
+        this.id = id;
+        this.userID = userID;
+        this.title = title;
+        this.description = description;
+        this.price = price;
+        this.time = time;
+        this.image = image;
+        this.address = address;
+        this.quantity = quantity;
+        this.numberRatePeople = numberRatePeople;
+        this.rateAvgRating = rateAvgRating;
+    }
 
     public Post(String id, String userID, String title, String description, long price, String time, String image, String address, long quantity) {
         this.id = id;

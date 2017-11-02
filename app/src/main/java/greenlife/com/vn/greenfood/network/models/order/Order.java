@@ -17,7 +17,6 @@ public class Order implements Serializable{
     private String foodName;
     @SerializedName("image_food")
     private String foodImgLink;
-    private long quantity;
     private String type;
     private String time;
     private String status;
@@ -25,39 +24,27 @@ public class Order implements Serializable{
     public Order() {
     }
 
-    public Order(String buyerID, String buyerName, String sellerID, String foodName, String foodImgLink, long quantity, String type, String time, String status) {
+    public Order(String buyerID, String buyerName, String sellerID, String foodName, String foodImgLink, String type, String time, String status) {
         this.buyerID = buyerID;
         this.buyerName = buyerName;
         this.sellerID = sellerID;
         this.foodName = foodName;
         this.foodImgLink = foodImgLink;
-        this.quantity = quantity;
         this.type = type;
         this.time = time;
         this.status = status;
     }
 
-    public Order(String buyerID, String sellerID, String foodName, String foodImgLink, long quantity, String type, String time, String status) {
+    public Order(String buyerID, String sellerID, String foodName, String foodImgLink, String type, String time, String status) {
         this.buyerID = buyerID;
         this.sellerID = sellerID;
         this.foodName = foodName;
         this.foodImgLink = foodImgLink;
-        this.quantity = quantity;
         this.type = type;
         this.time = time;
         this.status = status;
     }
 
-    public Order(String buyerID,String buyerName ,String sellerID, String foodName, String foodImgLink, long quantity, String type, String time) {
-        this.buyerID = buyerID;
-        this.buyerName = buyerName;
-        this.sellerID = sellerID;
-        this.foodName = foodName;
-        this.foodImgLink = foodImgLink;
-        this.quantity = quantity;
-        this.type = type;
-        this.time = time;
-    }
 
     public String getBuyerID() {
         return buyerID;
@@ -73,10 +60,6 @@ public class Order implements Serializable{
 
     public String getFoodImgLink() {
         return foodImgLink;
-    }
-
-    public long getQuantity() {
-        return quantity;
     }
 
     public String getType() {
@@ -103,7 +86,6 @@ public class Order implements Serializable{
                 ", sellerID='" + sellerID + '\'' +
                 ", foodName='" + foodName + '\'' +
                 ", foodImgLink='" + foodImgLink + '\'' +
-                ", quantity=" + quantity +
                 ", type='" + type + '\'' +
                 ", time='" + time + '\'' +
                 ", status='" + status + '\'' +

@@ -159,7 +159,7 @@ public class NotificationFragment extends Fragment {
                 MapsUltils.getUser(context, order.getBuyerID(), new GetUserFromIDListener() {
                     @Override
                     public void getUserFromID(User user) {
-                        tvTitle.setText(user.getName() + " order " +  + order.getQuantity() + " " + order.getFoodName());
+                        tvTitle.setText(user.getName() + " order "  + " " + order.getFoodName());
                         tvDescription.setText(order.getTime());
                     }
                 });
@@ -167,7 +167,7 @@ public class NotificationFragment extends Fragment {
                 MapsUltils.getUser(context, order.getSellerID(), new GetUserFromIDListener() {
                     @Override
                     public void getUserFromID(User user) {
-                        tvTitle.setText("Bạn đã order " + order.getQuantity() + " " + order.getFoodName() + " của " + user.getName());
+                        tvTitle.setText("Bạn đã order "  + " " + order.getFoodName() + " của " + user.getName());
                         tvDescription.setText(order.getTime());
                     }
                 });
