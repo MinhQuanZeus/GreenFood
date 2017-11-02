@@ -124,6 +124,8 @@ public class AddFoodActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private ProgressDialog progressDialog;
 
+    String key;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,7 +163,7 @@ public class AddFoodActivity extends AppCompatActivity {
         mDatabaseReference = FirebaseDatabase.getInstance()
                 .getReference()
                 .child("post");
-        String key = mDatabaseReference.push().getKey();
+        key = mDatabaseReference.push().getKey();
         mStorageReference = FirebaseStorage.getInstance()
                 .getReference()
                 .child(key);
@@ -200,6 +202,7 @@ public class AddFoodActivity extends AppCompatActivity {
                                 if(!tokenID.equals("")){
                                     newPost.child(FIREBASE_POST_TOKEN_ID).setValue(tokenID);
                                 }
+                                newPost.child("id").setValue(mDatabaseReference.push().getKey());
                                 newPost.child(FIREBASE_POST_TITLE).setValue(etFoodName.getText().toString());
                                 newPost.child(FIREBASE_POST_DESCRIPTION).setValue(etDescription.getText().toString());
                                 newPost.child(FIREBASE_POST_PRICE).setValue(Long.parseLong(etFoodPrice.getText().toString().replaceAll("[₫,. ]", "")));

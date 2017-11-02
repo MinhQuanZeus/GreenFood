@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,6 +22,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.Map;
 
 import greenlife.com.vn.greenfood.R;
 import greenlife.com.vn.greenfood.models.Post;
@@ -36,24 +39,26 @@ public class RatingDialogFragment extends DialogFragment {
     RatingBar ratingBar;
     Button getRating;
 
-    private  DatabaseReference databaseReference;
+    private DatabaseReference databaseReference;
 
     private StorageReference mStorageReference;
-    private Post post ;
+    private Post post;
     private String user_Current_Id;
 
-    private UserRatePost cur_userpost;
+    private UserRatePost cur_userRatepost;
 
     private User userSeller;
 
-    public static RatingDialogFragment  ratingDialogFragment;
+    public static RatingDialogFragment ratingDialogFragment;
 
-    public static RatingDialogFragment getInstant(){
-        if(ratingDialogFragment == null){
+    String postID ;
+
+    public static RatingDialogFragment getInstant() {
+        if (ratingDialogFragment == null) {
 
             ratingDialogFragment = new RatingDialogFragment();
         }
-        return  ratingDialogFragment;
+        return ratingDialogFragment;
     }
 
     public RatingDialogFragment() {
@@ -64,35 +69,47 @@ public class RatingDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_rating_dialog, container, false);
-        getDialog().setTitle("Rate us");
+        getDialog().setTitle("Đánh Gía");
         ratingBar = (RatingBar) view.findViewById(R.id.rating_bar);
         getRating = (Button) view.findViewById(R.id.get_rating);
         getRating.setOnClickListener(new OnGetRatingClickListener());
         return view;
     }
 
-    public void setData(Post post , String currentuserId){
-        this.post = post;
+    public void setData(String postId, String currentuserId) {
+        postID = postId;
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("post").orderByChild("id").equalTo(postID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                post = dataSnapshot.getValue(Post.class);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         this.user_Current_Id = currentuserId;
     }
 
-    private class OnGetRatingClickListener implements View.OnClickListener{
+    private class OnGetRatingClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             //RatingBar$getRating() returns float value, you should cast(convert) it to string to display in a view
-            long rating = (long)ratingBar.getRating();
+            long rating = (long) ratingBar.getRating();
             databaseReference = FirebaseDatabase.getInstance().getReference();
-            if(!isNetworkAvailable()){
+            if (!isNetworkAvailable()) {
                 Toast.makeText(getContext(), "Không có Internet", Toast.LENGTH_SHORT).show();
-            }else {
+            } else {
                 //HANDLE UPDATE RATE
-
                 //step 1 : GET POST
                 getPostCurrent(getContext(), post.getId());
 
                 getPostUserCurrent(getContext(), post.getId(), user_Current_Id);
 
-                if (cur_userpost == null) {
+                if (cur_userRatepost == null) {
                     float sum = post.getNumberRatePeople() * post.getRateAvgRating() + rating;
                     float avrRate = sum / (post.getNumberRatePeople() + 1);
 
@@ -106,20 +123,19 @@ public class RatingDialogFragment extends DialogFragment {
                     updateUserseller();
 
 
-
                 } else {
                     //set userseller
-                    getUser(getContext(), user_Current_Id);
+                    //  getUser(getContext(), user_Current_Id);
 
-                    cur_userpost.setRate(rating);
+                    // cur_userpost.setRate(rating);
                     //push lên
 
                     //getall userpost chia trung binh
                     //add userpost
 
-                        updatePost();
-                        pushUserpost(rating);
-                        updateUserseller();
+                    //   updatePost();
+                    //  pushUserpost(rating);
+                    //  updateUserseller();
 
                 }
 
@@ -130,7 +146,7 @@ public class RatingDialogFragment extends DialogFragment {
 
             }
             Toast.makeText(getContext(), "Thành công ! Cám ơn sự đánh giá của bạn", Toast.LENGTH_SHORT).show();
-                ratingDialogFragment.dismiss();
+            ratingDialogFragment.dismiss();
 
         }
     }
@@ -152,15 +168,17 @@ public class RatingDialogFragment extends DialogFragment {
 
         databaseReference = mDatabaseReference.push();
 
+        databaseReference.child("id").setValue(mDatabaseReference.push().getKey());
         databaseReference.child("idUser").setValue(user_Current_Id);
-        databaseReference.child("idPost").setValue(post.getId()+"");
+        databaseReference.child("idPost").setValue(post.getId() + "");
         databaseReference.child("rate").setValue(rating);
 
     }
 
     private void updatePost() {
-        databaseReference.child("post").child(post.getId()).child("numberRatePeople").setValue(post.getNumberRatePeople() + "");
-        databaseReference.child("post").child(post.getId()).child("rateAvgRating").setValue(post.getRateAvgRating() + "");
+        databaseReference.child("post").child(post.getId()).child("numberRatePeople").setValue(post.getNumberRatePeople());
+        databaseReference.child("post").child(post.getId()).child("rateAvgRating").setValue(post.getRateAvgRating());
+
     }
 
 
@@ -185,29 +203,28 @@ public class RatingDialogFragment extends DialogFragment {
 
     private void getPostCurrent(final Context context, String postID) {
         databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.child("post")
-                .child(postID)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        post = dataSnapshot.getValue(Post.class);
-                        
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+        databaseReference.child("post").orderByChild("id").equalTo(postID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                post = dataSnapshot.getValue(Post.class);
 
-                    }
-                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
-    private void getPostUserCurrent(final Context context, String postID , String userId) {
+    private void getPostUserCurrent(final Context context, String postID, String userId) {
         databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.child("userposts").child(postID).child(userId)
+        databaseReference.child("userrateposts").orderByChild("idPost").equalTo(postID).orderByChild("idUser").equalTo(userId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        cur_userpost = dataSnapshot.getValue(UserRatePost.class);
+                        cur_userRatepost = dataSnapshot.getValue(UserRatePost.class);
 
                     }
 
@@ -220,7 +237,7 @@ public class RatingDialogFragment extends DialogFragment {
 
     private boolean isNetworkAvailable() {
         ConnectivityManager cm =
-                (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null &&
