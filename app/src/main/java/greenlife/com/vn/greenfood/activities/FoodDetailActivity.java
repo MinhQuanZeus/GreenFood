@@ -146,7 +146,7 @@ public class FoodDetailActivity extends AppCompatActivity {
 
     private void loadData() {
         Intent intent = getIntent();
-        String postID = (String) intent.getSerializableExtra("postID");
+        String postID = (String) intent.getSerializableExtra("postId");
         DatabaseReference databaseReference;
         databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReference.child("post").orderByChild("id").equalTo(postID).addListenerForSingleValueEvent(new ValueEventListener() {
