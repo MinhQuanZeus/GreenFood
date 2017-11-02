@@ -165,28 +165,19 @@ public class LoginFragment extends Fragment {
                                     Toast.LENGTH_SHORT).show();
                             sendRegistrationToServer(user.getUid());
                             FirebaseMessaging.getInstance().subscribeToTopic(user.getUid());
-                            Log.d(TAG, "From: topic " + user.getUid());
                             Intent intent = new Intent(getContext(), MainActivity.class);
                             startActivity(intent);
                             _loginButton.setEnabled(true);
 
                         } else {
-                            // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
                             Toast.makeText(getContext(), getResources().getString(R.string.invalid_username_or_password),
                                     Toast.LENGTH_SHORT).show();
                             _loginButton.setEnabled(true);
                         }
 
-                        // ...
                     }
                 });
-    }
-
-
-    public void onLoginSuccess() {
-        _loginButton.setEnabled(true);
-        //TODO: Move to main activity
     }
 
     public void onLoginFailed() {
@@ -200,6 +191,7 @@ public class LoginFragment extends Fragment {
 
         String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
+        String regex = "^(?i)(?=.*[a-z])(?=.*[0-9])[a-z0-9#.!@$*&_]{5,}$";
 
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             _emailText.setError(getResources().getString(R.string.invalid_email));
@@ -208,7 +200,7 @@ public class LoginFragment extends Fragment {
             _emailText.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 4) {
+        if (password.isEmpty() || password.matches(regex)) {
             _passwordText.setError(getResources().getString(R.string.short_password));
             valid = false;
         } else {
@@ -313,16 +305,9 @@ public class LoginFragment extends Fragment {
             if (accessToken != null) {
                 toastMessage = "Success:" + accessToken.getAccountId()
                         + tokenRefreshIntervalInSeconds;
-                String phoneNumberString = "";
-                //  startActivity(new Intent(this, TokenActivity.class));
-                //Todo success
                 AccountKit.getCurrentAccount(new AccountKitCallback<Account>() {
                     @Override
                     public void onSuccess(final Account account) {
-                        // Get Account Kit ID
-                        String accountKitId = account.getId();
-
-                        // Get phone number
                         PhoneNumber phoneNumber = account.getPhoneNumber();
                         String phoneNumberString = phoneNumber.toString();
                         ScreenManager.openFragment(getActivity().getSupportFragmentManager(), new RegisterFragment().setPhoneNumber(phoneNumberString), R.id.content, false);
@@ -330,7 +315,6 @@ public class LoginFragment extends Fragment {
 
                     @Override
                     public void onError(final AccountKitError error) {
-                        // Handle Error
                     }
                 });
 
