@@ -92,7 +92,7 @@ public class NormalNewFeedFragment extends Fragment implements AAH_FabulousFragm
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(getContext(), FoodDetailActivity.class).putExtra("post", model);
+                        Intent intent = new Intent(getContext(), FoodDetailActivity.class).putExtra("post", model.getId());
                         Log.d("Detail", "Des: " + model.getDescription());
                         startActivity(intent);
                     }

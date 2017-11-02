@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -93,7 +94,6 @@ public class FoodDetailActivity extends AppCompatActivity {
     }
 
 
-
     private void onReceiverOrder() {
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -108,7 +108,7 @@ public class FoodDetailActivity extends AppCompatActivity {
                     // new push notification is received
 
                     String message = intent.getStringExtra("message");
-                    Log.d(TAG, "on receiver order : "+message);
+                    Log.d(TAG, "on receiver order : " + message);
                 }
             }
         };
@@ -146,13 +146,33 @@ public class FoodDetailActivity extends AppCompatActivity {
 
     private void loadData() {
         Intent intent = getIntent();
-        String postID = (String) intent.getSerializableExtra("postId");
-        DatabaseReference databaseReference;
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.child("post").orderByChild("id").equalTo(postID).addListenerForSingleValueEvent(new ValueEventListener() {
+        String postID = (String) intent.getSerializableExtra("post");
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mDatabaseReference.child("post").orderByChild("id").equalTo(postID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                post = dataSnapshot.getValue(Post.class);
+
+                for (DataSnapshot messageSnapshot: dataSnapshot.getChildren()) {
+                    post = messageSnapshot.getValue(Post.class);
+                    break;
+                }
+
+                post =  dataSnapshot.getValue(Post.class);
+
+                if(post != null){
+                    tvPostTime.setText(post.getTime());
+                    Picasso.with(FoodDetailActivity.this)
+                            .load(post.getImage())
+                            .into(ivFood);
+                    getUser(FoodDetailActivity.this, post.getUserID());
+
+                    //Get distance 2 location, from current user to store
+                    tvDistance.setText(MapsUltils.getDistanceFromLocation("22C Thành Công, Khu tập thể Bắc Thành Công, Thành Công, Ba Đình, Hà Nội, Vietnam", post.getAddress(), tvDistance));
+                    tvDescription.setText(post.getDescription());
+                    tvFoodName.setText((post.getTitle()));
+                    tvPrice.setText(formatNumber(post.getPrice()));
+                    tvAddress.setText(post.getAddress());
+                }
 
             }
 
@@ -161,19 +181,8 @@ public class FoodDetailActivity extends AppCompatActivity {
 
             }
         });
-        tvPostTime.setText(post.getTime());
-      // User user = MapsUltils.getUser(this, post.getUserID());
-        Picasso.with(this)
-                .load(post.getImage())
-                .into(ivFood);
-        getUser(this, post.getUserID());
+       //  User user = MapsUltils.getUser(this, post.getUserID());
 
-        //Get distance 2 location, from current user to store
-        tvDistance.setText(MapsUltils.getDistanceFromLocation("22C Thành Công, Khu tập thể Bắc Thành Công, Thành Công, Ba Đình, Hà Nội, Vietnam", post.getAddress(), tvDistance));
-        tvDescription.setText(post.getDescription());
-        tvFoodName.setText((post.getTitle()));
-        tvPrice.setText(formatNumber(post.getPrice()));
-        tvAddress.setText(post.getAddress());
     }
 
     private void getUser(final Context context, String userID) {
@@ -220,7 +229,7 @@ public class FoodDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(post.getUserID().compareToIgnoreCase(firebaseAuth.getCurrentUser().getUid())==0){
+                if (post.getUserID().compareToIgnoreCase(firebaseAuth.getCurrentUser().getUid()) == 0) {
                     Toast.makeText(FoodDetailActivity.this, "Bạn không thể đặt hàng chính sản phẩm của mình ", Toast.LENGTH_SHORT).show();
                 } else {
                     sendOrderNotificationMessage();
@@ -235,12 +244,12 @@ public class FoodDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //Show rating dialog
 
-                if(post.getUserID().compareToIgnoreCase(firebaseAuth.getCurrentUser().getUid())==0){
+                if (post.getUserID().compareToIgnoreCase(firebaseAuth.getCurrentUser().getUid()) == 0) {
                     Toast.makeText(FoodDetailActivity.this, "Bạn không thể tự đánh giá mình ", Toast.LENGTH_SHORT).show();
                 } else {
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     RatingDialogFragment ratingBarFragment = RatingDialogFragment.getInstant();
-                    ratingBarFragment.setData( post.getId() ,firebaseAuth.getCurrentUser().getUid());
+                    ratingBarFragment.setData(post.getId(), firebaseAuth.getCurrentUser().getUid());
                     ratingBarFragment.show(fragmentManager, "dialog");
                 }
 
@@ -255,14 +264,14 @@ public class FoodDetailActivity extends AppCompatActivity {
     private void sendOrderNotificationMessage() {
         //get Token ID
         getUser(this, post.getUserID());
-        Log.d(TAG,"address ID : "+sellerUser.getTokenID());
+        Log.d(TAG, "address ID : " + sellerUser.getTokenID());
         MapsUltils.getUser(this, firebaseAuth.getCurrentUser().getUid(), new GetUserFromIDListener() {
             @Override
             public void getUserFromID(User user) {
                 Order order = null;
                 Log.d(TAG, "token ID : " + user.getTokenID());
                 final String now = LibrarySupportManager.getInstance().currentDateTime();
-                if(post != null){
+                if (post != null) {
                     order = new Order(
                             firebaseAuth.getCurrentUser().getUid(),
                             user.getName(),
@@ -275,25 +284,25 @@ public class FoodDetailActivity extends AppCompatActivity {
                 }
 
                 Log.d(TAG, "my order : " + order.toString());
-                if(order != null) {
-                    Log.d(TAG,"From: "+sellerUser.getUserID());
+                if (order != null) {
+                    Log.d(TAG, "From: " + sellerUser.getUserID());
                     Map<String, String> headerMap = new HashMap<>();
-                    headerMap.put("Content-Type","application/json");
-                    headerMap.put("Authorization","key=AAAAtbtKAQY:APA91bE6qVASCgSzgZmqeMHENWlmhL8ZFo7AH8p6GdevrosMTPs5tPIFwIE-qiGsijLQio9NPq62uVQAPIW5pegMl2hH6wPA1PwlfS9MocDAo9AIg6JZPiIeOnjgZNMUtxS4n8Z3uh6C");
+                    headerMap.put("Content-Type", "application/json");
+                    headerMap.put("Authorization", "key=AAAAtbtKAQY:APA91bE6qVASCgSzgZmqeMHENWlmhL8ZFo7AH8p6GdevrosMTPs5tPIFwIE-qiGsijLQio9NPq62uVQAPIW5pegMl2hH6wPA1PwlfS9MocDAo9AIg6JZPiIeOnjgZNMUtxS4n8Z3uh6C");
                     RetrofitFactory.getInstance("https://fcm.googleapis.com/fcm/")
                             .createService(SendOrderService.class)
                             .sendOrder(
                                     headerMap,
-                                    new SendOrderRequest("/topics/"+post.getUserID(), new NotificationAPI(order))
+                                    new SendOrderRequest("/topics/" + post.getUserID(), new NotificationAPI(order))
                             ).enqueue(new Callback<SendOrderResponse>() {
                         @Override
                         public void onResponse(Call<SendOrderResponse> call, Response<SendOrderResponse> response) {
                             Log.d(TAG, "response code : " + response.code());
 
-                            if(response.code() == 200){
+                            if (response.code() == 200) {
                                 Log.d(TAG, "OK send");
-                                if(response.body()
-                                        .getSuccess() != 0){
+                                if (response.body()
+                                        .getSuccess() != 0) {
                                     Log.d(TAG, "Success send");
                                     //create order list of buyer
                                     mDatabaseReference = FirebaseDatabase.getInstance()

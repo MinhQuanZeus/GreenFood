@@ -82,7 +82,11 @@ public class RatingDialogFragment extends DialogFragment {
         databaseReference.child("post").orderByChild("id").equalTo(postID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                post = dataSnapshot.getValue(Post.class);
+                for(DataSnapshot itemDataSnaphot : dataSnapshot.getChildren()){
+                    post = dataSnapshot.getValue(Post.class);
+                    break;
+                }
+
 
             }
 
