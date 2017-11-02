@@ -7,12 +7,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.util.ArrayMap;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +22,6 @@ import com.allattentionhere.fabulousfilter.AAH_FabulousFragment;
 import com.google.android.flexbox.FlexboxLayout;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,7 +30,7 @@ import greenlife.com.vn.greenfood.models.FilterTag;
 
 
 public class FilterFragment extends AAH_FabulousFragment {
-    HashMap<String, FilterTag> applied_filters = new HashMap<>();
+    HashMap<String, Integer> applied_filters = new HashMap<>();
     List<TextView> textviews = new ArrayList<>();
 
     TabLayout tabs_types;
@@ -43,7 +39,7 @@ public class FilterFragment extends AAH_FabulousFragment {
     private DisplayMetrics metrics;
     private SensorManager sensorManager;
 
-    private TextView currentRateTv = null;
+    private TextView currentTv = null;
     private TextView currentTimeTv = null;
 
     public static FilterFragment newInstance() {
@@ -110,11 +106,11 @@ public class FilterFragment extends AAH_FabulousFragment {
 
         //get NormalNewFeedFragment and setCallback
         List<Fragment> fragments = getActivity().getSupportFragmentManager().getFragments();
-        for (Fragment fragment:fragments){
-            if (fragment instanceof NewFeedFragment){
+        for (Fragment fragment : fragments) {
+            if (fragment instanceof NewFeedFragment) {
                 List<Fragment> childFragments = fragment.getChildFragmentManager().getFragments();
-                for(Fragment cf: childFragments){
-                    if (cf instanceof NormalNewFeedFragment){
+                for (Fragment cf : childFragments) {
+                    if (cf instanceof NormalNewFeedFragment) {
                         setCallbacks((Callbacks) cf);
                         break;
                     }
@@ -205,28 +201,20 @@ public class FilterFragment extends AAH_FabulousFragment {
                         tv.setTag("unselected");
                         tv.setBackgroundResource(R.drawable.chip_unselected);
                         tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_chips));
-                        removeFromSelectedMap(filter_category);
+                        applied_filters.remove(filter_category);
                     } else {
                         tv.setTag("selected");
                         tv.setBackgroundResource(R.drawable.chip_selected);
                         tv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_header));
-                        addToSelectedMap(filter_category, finalKeys.get(finalI));
 
-                        if (filter_category.equals("rating")){
-                            if (currentRateTv != null){
-                                currentRateTv.setTag("unselected");
-                                currentRateTv.setBackgroundResource(R.drawable.chip_unselected);
-                                currentRateTv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_chips));
-                            }
-                            currentRateTv = tv;
-                        }else if (filter_category.equals("time")){
-                            if (currentTimeTv!=null){
-                                currentTimeTv.setTag("unselected");
-                                currentTimeTv.setBackgroundResource(R.drawable.chip_unselected);
-                                currentTimeTv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_chips));
-                            }
-                            currentTimeTv = tv;
+                        applied_filters.put(filter_category, finalKeys.get(finalI).getValue());
+
+                        if (currentTv != null) {
+                            currentTv.setTag("unselected");
+                            currentTv.setBackgroundResource(R.drawable.chip_unselected);
+                            currentTv.setTextColor(ContextCompat.getColor(getContext(), R.color.filters_chips));
                         }
+                        currentTv =tv;
                     }
                 }
             });
@@ -246,22 +234,14 @@ public class FilterFragment extends AAH_FabulousFragment {
 
     }
 
-    private void addToSelectedMap(String key, FilterTag value) {
-        applied_filters.put(key, value);
-    }
-
-    private void removeFromSelectedMap(String key) {
-        applied_filters.remove(key);
-    }
-
 
     public List<FilterTag> getUniqueRatingKeys() {
         List<FilterTag> rating = new ArrayList<>();
-        rating.add(new FilterTag(">= 0", 0));
-        rating.add(new FilterTag(">= 1", 1));
-        rating.add(new FilterTag(">= 2", 2));
-        rating.add(new FilterTag(">= 3", 3));
-        rating.add(new FilterTag(">= 4", 4));
+        rating.add(new FilterTag("<= 1", 0));
+        rating.add(new FilterTag("<= 2", 1));
+        rating.add(new FilterTag("<= 3", 2));
+        rating.add(new FilterTag("<= 4", 3));
+        rating.add(new FilterTag("<= 5", 4));
         return rating;
     }
 
