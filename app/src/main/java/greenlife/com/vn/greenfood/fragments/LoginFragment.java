@@ -191,7 +191,6 @@ public class LoginFragment extends Fragment {
 
         String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
-        String regex = "^(?i)(?=.*[a-z])(?=.*[0-9])[a-z0-9#.!@$*&_]{5,}$";
 
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             _emailText.setError(getResources().getString(R.string.invalid_email));
@@ -200,7 +199,7 @@ public class LoginFragment extends Fragment {
             _emailText.setError(null);
         }
 
-        if (password.isEmpty() || password.matches(regex)) {
+        if (password.isEmpty() || password.length()<6) {
             _passwordText.setError(getResources().getString(R.string.short_password));
             valid = false;
         } else {

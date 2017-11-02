@@ -44,7 +44,8 @@
     <string name="success_register">Đăng ký thành công</string>
     <string name="email_existed">Email đã được đăng ký, vui lòng sử dụng mail khác</string>
     <string name="invalid_email">Email không đúng định dạng</string>
-    <string name="short_password">Mật khẩu ít nhất 4, chứa 1 số, chứa 1 chữ số, không chứa space</string>
+    <string name="weak_password">Mật khẩu phải chứa một số 0-9, một ký tự thường, một ký tự hoa một ký tự đặc biệt, ít nhất 6 ký tự, dài nhất 20 ký tự</string>
+    <string name="short_password">Mật khẩu ít nhất 6 ký tự</string>
     <string name="dont_match_password">Không khớp với mật khẩu bạn nhập</string>
     <string name="invalid_username_or_password">Sai email hoặc mật khẩu</string>
     <string name="login_success">Đăng nhập thành công</string>
