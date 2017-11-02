@@ -49,7 +49,6 @@ import java.util.Map;
 
 import greenlife.com.vn.greenfood.R;
 import greenlife.com.vn.greenfood.activities.MainActivity;
-import greenlife.com.vn.greenfood.activities.Profile;
 import greenlife.com.vn.greenfood.managers.ScreenManager;
 import greenlife.com.vn.greenfood.utils.NetworkUtils;
 
@@ -167,7 +166,7 @@ public class LoginFragment extends Fragment {
                             sendRegistrationToServer(user.getUid());
                             FirebaseMessaging.getInstance().subscribeToTopic(user.getUid());
                             Log.d(TAG, "From: topic " + user.getUid());
-                            Intent intent = new Intent(getContext(), Profile.class);
+                            Intent intent = new Intent(getContext(), MainActivity.class);
                             startActivity(intent);
                             _loginButton.setEnabled(true);
 

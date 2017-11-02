@@ -23,7 +23,7 @@ import greenlife.com.vn.greenfood.R;
 import greenlife.com.vn.greenfood.models.User;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
-public class Profile extends AppCompatActivity implements View.OnClickListener{
+public class ProfileActivity extends AppCompatActivity implements View.OnClickListener{
     private FirebaseAuth mAuth;
     private User user;
     ImageView isAvatar;
@@ -41,7 +41,7 @@ public class Profile extends AppCompatActivity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         mAuth = FirebaseAuth.getInstance();
-        defineUser = getIntent().getStringExtra("uerID");
+        defineUser = getIntent().getStringExtra("userId");
         String uId = mAuth.getCurrentUser().getUid();
         isAvatar = (ImageView)findViewById(R.id.iv_profile_image);
         userName = (TextView)findViewById(R.id.tv_username);
@@ -116,7 +116,7 @@ public class Profile extends AppCompatActivity implements View.OnClickListener{
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_fixInfor:
-                Log.d("Profile", "onclick");
+                Log.d("ProfileActivity", "onclick");
                 Intent changeProfile = new Intent(this,ChangeProfileActivity.class);
                 startActivity(changeProfile);
                 break;

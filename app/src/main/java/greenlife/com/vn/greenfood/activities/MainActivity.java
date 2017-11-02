@@ -42,9 +42,11 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_notifications:
                     ScreenManager.openFragment(getSupportFragmentManager(),new NotificationFragment(),R.id.content,false);
                     return true;
-//                case R.id.navigation_profile:
-//                    ScreenManager.openFragment(getSupportFragmentManager(),new MeFragment(),R.id.content,false);
-//                    return true;
+                case R.id.navigation_profile:
+                    Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                    intent.putExtra("userId", firebaseAuth.getCurrentUser().getUid());
+                    startActivity(intent);
+                    return true;
             }
             return false;
         }
