@@ -1,9 +1,11 @@
 package greenlife.com.vn.greenfood.models;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
 /**
  * Created by thean on 11/2/2017.
  */
-
+@IgnoreExtraProperties
 public class UserRatePost {
 
     private String id;
@@ -11,13 +13,16 @@ public class UserRatePost {
     private String idPost;
 
 
-    private long rate;
+    private float rate;
 
-    public UserRatePost(String id, String idUser, String idPost, long rate) {
+    public UserRatePost(String id, String idUser, String idPost, float rate) {
         this.id = id;
         this.idUser = idUser;
         this.idPost = idPost;
         this.rate = rate;
+    }
+
+    public UserRatePost() {
     }
 
     public String getId() {
@@ -44,7 +49,7 @@ public class UserRatePost {
         this.idPost = idPost;
     }
 
-    public long getRate() {
+    public float getRate() {
         return rate;
     }
 

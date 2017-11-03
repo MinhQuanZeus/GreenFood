@@ -23,6 +23,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import greenlife.com.vn.greenfood.R;
@@ -47,7 +49,6 @@ public class RatingDialogFragment extends DialogFragment {
 
     private UserRatePost cur_userRatepost;
 
-    private User userSeller;
 
     public static RatingDialogFragment ratingDialogFragment;
 
@@ -76,18 +77,16 @@ public class RatingDialogFragment extends DialogFragment {
         return view;
     }
 
-    public void setData(String postId, String currentuserId) {
-        postID = postId;
+    public synchronized void setData(String postId, String currentuserId) {
+        this.postID = postId;
         databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReference.child("post").orderByChild("id").equalTo(postID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot itemDataSnaphot : dataSnapshot.getChildren()){
-                    post = dataSnapshot.getValue(Post.class);
+                    post = itemDataSnaphot.getValue(Post.class);
                     break;
                 }
-
-
             }
 
             @Override
@@ -100,20 +99,17 @@ public class RatingDialogFragment extends DialogFragment {
 
     private class OnGetRatingClickListener implements View.OnClickListener {
         @Override
-        public void onClick(View view) {
+        public synchronized void onClick(View view) {
             //RatingBar$getRating() returns float value, you should cast(convert) it to string to display in a view
-            long rating = (long) ratingBar.getRating();
+            float rating = (float) ratingBar.getRating();
             databaseReference = FirebaseDatabase.getInstance().getReference();
             if (!isNetworkAvailable()) {
                 Toast.makeText(getContext(), "Không có Internet", Toast.LENGTH_SHORT).show();
             } else {
                 //HANDLE UPDATE RATE
                 //step 1 : GET POST
-                getPostCurrent(getContext(), post.getId());
-
-                getPostUserCurrent(getContext(), post.getId(), user_Current_Id);
-
-                if (cur_userRatepost == null) {
+                getPostUserCurrent(getContext(),post.getId(), user_Current_Id);
+               // if (cur_userRatepost == null) {
                     float sum = post.getNumberRatePeople() * post.getRateAvgRating() + rating;
                     float avrRate = sum / (post.getNumberRatePeople() + 1);
 
@@ -121,32 +117,16 @@ public class RatingDialogFragment extends DialogFragment {
                     post.setNumberRatePeople(post.getNumberRatePeople() + 1);
 
                     //add userpost
-
-                    updatePost();
                     pushUserpost(rating);
-                    updateUserseller();
+                    updatePost();
 
 
-                } else {
-                    //set userseller
-                    //  getUser(getContext(), user_Current_Id);
+              //  } else {
 
-                    // cur_userpost.setRate(rating);
-                    //push lên
+               //     updateUserPost(rating);
+              //      updatePostNew();
+             //   }
 
-                    //getall userpost chia trung binh
-                    //add userpost
-
-                    //   updatePost();
-                    //  pushUserpost(rating);
-                    //  updateUserseller();
-
-                }
-
-                //UPDATE POST
-
-
-                //UPDATE USER
 
             }
             Toast.makeText(getContext(), "Thành công ! Cám ơn sự đánh giá của bạn", Toast.LENGTH_SHORT).show();
@@ -155,8 +135,72 @@ public class RatingDialogFragment extends DialogFragment {
         }
     }
 
-    private void updateUserseller() {
+    private void updatePostNew() {
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("userrateposts").orderByChild("idPost").equalTo(postID)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        final ArrayList<Float> listAVG = new ArrayList<>();
+                        for(DataSnapshot itemData : dataSnapshot.getChildren()){
+                            UserRatePost tempPost = itemData.getValue(UserRatePost.class);
+                            listAVG.add(tempPost.getRate());
+
+                        }
+                        float sum = 0;
+                        for(Float a : listAVG){
+                            sum = + a;
+                        }
+                        final float avg = sum/listAVG.size();
+
+                        databaseReference.child("post").orderByChild("id").equalTo(postID)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        for(DataSnapshot itemData : dataSnapshot.getChildren()){
+
+                                            databaseReference.child("post").child(itemData.getKey()).child("rate").setValue(avg);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
+
+    private void updateUserPost(final float rating) {
+
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("userrateposts").orderByChild("idPost").equalTo(postID).orderByChild("idUser").equalTo(user_Current_Id)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot itemData : dataSnapshot.getChildren()){
+                            databaseReference.child("userrateposts").child(itemData.getKey()).child("rate").setValue(rating);
+                            break;
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+    }
+
+
 
     private void pushUserpost(double rating) {
         DatabaseReference mDatabaseReference;
@@ -174,27 +218,24 @@ public class RatingDialogFragment extends DialogFragment {
 
         databaseReference.child("id").setValue(mDatabaseReference.push().getKey());
         databaseReference.child("idUser").setValue(user_Current_Id);
-        databaseReference.child("idPost").setValue(post.getId() + "");
+        databaseReference.child("idPost").setValue(post.getId());
         databaseReference.child("rate").setValue(rating);
 
     }
 
-    private void updatePost() {
-        databaseReference.child("post").child(post.getId()).child("numberRatePeople").setValue(post.getNumberRatePeople());
-        databaseReference.child("post").child(post.getId()).child("rateAvgRating").setValue(post.getRateAvgRating());
+    private synchronized void updatePost() {
 
-    }
-
-
-    private void getUser(final Context context, String userID) {
-
-        databaseReference.child("users")
-                .child(userID)
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("post").orderByChild("id").equalTo(postID)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        userSeller = dataSnapshot.getValue(User.class);
+                    public synchronized void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot itemData : dataSnapshot.getChildren()){
+                            databaseReference.child("post").child(itemData.getKey()).child("numberRatePeople").setValue(post.getNumberRatePeople());
+                            databaseReference.child("post").child(itemData.getKey()).child("rateAvgRating").setValue(post.getRateAvgRating());
 
+                            break;
+                        }
                     }
 
                     @Override
@@ -202,34 +243,84 @@ public class RatingDialogFragment extends DialogFragment {
 
                     }
                 });
+       // databaseReference.child("post").child(post.getId()).child("numberRatePeople").setValue(post.getNumberRatePeople());
+       // databaseReference.child("post").child(post.getId()).child("rateAvgRating").setValue(post.getRateAvgRating());
 
     }
 
-    private void getPostCurrent(final Context context, String postID) {
-        databaseReference = FirebaseDatabase.getInstance().getReference();
+//    private void updateUser(){
+//         final ArrayList listSum = new ArrayList<>();
+//        databaseReference = FirebaseDatabase.getInstance().getReference();
+//        databaseReference.child("userrateposts").addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                        for(DataSnapshot itemData : dataSnapshot.getChildren()){
+//
+//                            UserRatePost userRatePost = itemData.getValue(UserRatePost.class);
+//
+//                            databaseReference.child("post").orderByChild("id ").equalTo(userRatePost.getIdPost())
+//                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(DataSnapshot dataSnapshot) {
+//                                            for(DataSnapshot itemData : dataSnapshot.getChildren()){
+//                                                Post temPost = itemData.getValue(Post.class);
+//                                                if(temPost.getUserID().equals(post.getUserID())){
+//                                                    listSum.add(temPost.getRateAvgRating());
+//                                                }
+//
+//                                                break;
+//                                            }
+//                                        }
+//
+//                                        @Override
+//                                        public void onCancelled(DatabaseError databaseError) {
+//
+//                                        }
+//                                    });
+//
+//
+//
+//
+//                        }
+//
+//
+//
+//
+//
+//                            float sum = 0 ;
+//
+//                            for (Object a: listSum) {
+//                                sum = + (Float) a;
+//                            }
+//
+//                            databaseReference.child("users").child(user_Current_Id).setValue(sum/listSum.size())
+//                            break;
+//
+//
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//
+//                    }
+//                });
+//
+//    }
 
-        databaseReference.child("post").orderByChild("id").equalTo(postID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                post = dataSnapshot.getValue(Post.class);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
 
     private void getPostUserCurrent(final Context context, String postID, String userId) {
         databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.child("userrateposts").orderByChild("idPost").equalTo(postID).orderByChild("idUser").equalTo(userId)
+        databaseReference.child("userrateposts").orderByChild("idPost").equalTo(postID)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        cur_userRatepost = dataSnapshot.getValue(UserRatePost.class);
-
+                        for(DataSnapshot itemData : dataSnapshot.getChildren()){
+                            UserRatePost userRatePost = itemData.getValue(UserRatePost.class);
+                            if(userRatePost.getIdUser().equals(user_Current_Id)){
+                                cur_userRatepost = userRatePost;
+                            }
+                        }
                     }
 
                     @Override
