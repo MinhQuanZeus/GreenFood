@@ -58,7 +58,7 @@
     <string name="hint_input_food_address">Địa Chỉ</string>
     <string name="post_title">Post</string>
 
-    <string name="tv_food_avaiable">Gía:</string>
+    <string name="tv_food_avaiable">Giá:</string>
     <string name="tv_food_address">Địa Chỉ : </string>
     <string name="smilar">Tương tự</string>
     <string name="order_button">Order</string>

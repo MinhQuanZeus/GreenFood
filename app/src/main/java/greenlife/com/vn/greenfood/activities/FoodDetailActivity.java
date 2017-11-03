@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import greenlife.com.vn.greenfood.fragments.rating_fragment.RatingDialogFragment;
+import greenlife.com.vn.greenfood.network.models.distance.MainObject;
+import greenlife.com.vn.greenfood.network.services.GetDistanceService;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,6 +58,8 @@ import greenlife.com.vn.greenfood.utils.Config;
 import greenlife.com.vn.greenfood.utils.LibrarySupportManager;
 import greenlife.com.vn.greenfood.utils.MapsUltils;
 import greenlife.com.vn.greenfood.utils.NotificationHandleUtils;
+
+import static android.content.ContentValues.TAG;
 
 public class FoodDetailActivity extends AppCompatActivity {
 
@@ -81,6 +85,8 @@ public class FoodDetailActivity extends AppCompatActivity {
     private Button btnOrder;
     private TextView tvFoodName;
     private Button btn_rating;
+
+    private String distance;
 
 
     @Override
@@ -141,8 +147,10 @@ public class FoodDetailActivity extends AppCompatActivity {
                 finish();
             }
         });
-        loadData();
+
     }
+
+
 
     private synchronized void loadData() {
         Intent intent = getIntent();
@@ -165,11 +173,13 @@ public class FoodDetailActivity extends AppCompatActivity {
                     getUser(FoodDetailActivity.this, post.getUserID());
 
                     //Get distance 2 location, from current user to store
-                    tvDistance.setText(MapsUltils.getDistanceFromLocation("22C Thành Công, Khu tập thể Bắc Thành Công, Thành Công, Ba Đình, Hà Nội, Vietnam", post.getAddress(), tvDistance));
+                    //tvDistance.setText(MapsUltils.getDistanceFromLocation("22C Thành Công, Khu tập thể Bắc Thành Công, Thành Công, Ba Đình, Hà Nội, Vietnam", post.getAddress(), tvDistance));
+                    showLocation(post.getAddress());
                     tvDescription.setText(post.getDescription());
                     tvFoodName.setText((post.getTitle()));
                     tvPrice.setText(formatNumber(post.getPrice()));
                     tvAddress.setText(post.getAddress());
+                    ratingBar.setRating(post.getRateAvgRating());
                 }
 
             }
@@ -181,6 +191,60 @@ public class FoodDetailActivity extends AppCompatActivity {
         });
        //  User user = MapsUltils.getUser(this, post.getUserID());
 
+    }
+
+    private void showLocation(final String destination) {
+        String uid = FirebaseAuth.getInstance().getUid();
+        final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users/" + uid);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                Log.d("tungds23", user.getAddress());
+                getDistanceFromLocation(user.getAddress(), destination);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private String getDistanceFromLocation(String current, final String destinate) {
+        GetDistanceService getDistanceService = RetrofitFactory.getInstance("https://developers.google.com/maps/")
+                .createService(GetDistanceService.class);
+        getDistanceService.getDistance("imperial", current, destinate, "AIzaSyBs7LWRp7vadlOd79qe_c01BTwRw_KF5VE")
+                .enqueue(new Callback<MainObject>() {
+                    @Override
+                    public void onResponse(Call<MainObject> call, Response<MainObject> response) {
+                        if (response.code() == 200) {
+                            String statusGoogleAPI = response.body()
+                                    .getStatusGoogleAPI();
+                            if (statusGoogleAPI.equals("OK")) {
+                                String status = response.body()
+                                        .getRows().get(0)
+                                        .getElements().get(0)
+                                        .getStatus();
+                                if (status.equals("OK")) {
+                                    distance = response.body()
+                                            .getRows().get(0)
+                                            .getElements().get(0)
+                                            .getDistance()
+                                            .getText();
+                                } else distance = "";
+                            } else distance = "";
+                            tvDistance.setText(LibrarySupportManager.getInstance().distanceFromLocationFormat(distance));
+                        }
+                        Log.d(TAG, "distance : " + distance);
+                    }
+
+                    @Override
+                    public void onFailure(Call<MainObject> call, Throwable t) {
+
+                    }
+                });
+        return distance;
     }
 
     private void getUser(final Context context, String userID) {
@@ -333,7 +397,7 @@ public class FoodDetailActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
+        loadData();
         // register GCM registration complete receiver
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter("registrationComplete"));
