@@ -402,12 +402,12 @@ public class RegisterFragment extends Fragment {
     private void displayAttachImageDialog() {
         CharSequence[] items;
         if (mImageToBeAttached != null)
-            items = new CharSequence[]{"Take photo", "Choose photo", "Delete photo"};
+            items = new CharSequence[]{"Chụp ảnh", "Chọn ảnh", "Xóa ảnh"};
         else
-            items = new CharSequence[]{"Take photo", "Choose photo"};
+            items = new CharSequence[]{"Chụp ảnh", "Chọn ảnh"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Anh dai dien");
+        builder.setTitle("Ảnh đại diện");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {

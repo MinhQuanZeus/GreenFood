@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="350dp"
+    android:layout_height="370dp"
     android:orientation="vertical"
     android:padding="5dp">
     <TextView
@@ -24,12 +24,12 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:id="@+id/iv_food"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_alignParentStart="true"
-                android:layout_below="@id/rating_bar"
+                android:layout_below="@id/iv_avatar"
                 android:background="@drawable/ic_local_dining_black_24dp"
                 android:scaleType="centerCrop"/>
 
@@ -81,8 +81,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/tv_food_name"
-                android:layout_below="@+id/tv_food_name"
+                android:layout_below="@+id/rating_bar"
                 android:text="20/06/2017 lúc 22:30"
+                android:paddingTop="5dp"
                 android:textColor="@color/secondary_text"
                 android:textSize="13sp" />
 
@@ -123,9 +124,10 @@
                 android:id="@+id/tv_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/iv_avatar"
-                android:layout_marginStart="12dp"
-                android:layout_toEndOf="@+id/iv_avatar"
+                android:layout_above="@+id/iv_food"
+                android:layout_alignEnd="@+id/tv_totalRate"
+                android:layout_marginBottom="14sp"
+                android:layout_marginLeft="8dp"
                 android:text="Minh Quan"
                 android:textColor="@color/primary_text" />
 
@@ -134,9 +136,8 @@
                 style="?android:attr/ratingBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/iv_avatar"
-                android:layout_alignStart="@+id/tv_username"
-                android:layout_below="@+id/tv_username"
+                android:layout_alignStart="@+id/tv_food_name"
+                android:layout_below="@+id/tv_food_name"
                 android:numStars="5"
                 android:paddingTop="5dp"
                 android:rating="4.5"
@@ -148,10 +149,9 @@
                 android:id="@+id/tv_totalRate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="( 15 )"
-                android:layout_toEndOf="@id/rating_bar"
-                android:layout_below="@+id/tv_username"
-                android:layout_marginStart="3dp"/>
+                android:layout_above="@+id/tv_current_time"
+                android:layout_toEndOf="@+id/rating_bar"
+                android:text="( 15 )" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 </RelativeLayout>

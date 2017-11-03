@@ -1,5 +1,7 @@
 package greenlife.com.vn.greenfood.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -141,7 +143,7 @@ public class AddFoodActivity extends AppCompatActivity {
         ivAddImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dispatchTakePhotoIntent();
+                displayAttachImageDialog();
             }
         });
         ivDeleteImage.setOnClickListener(new View.OnClickListener() {
@@ -510,6 +512,37 @@ public class AddFoodActivity extends AppCompatActivity {
         } else {
             requestPermission();
         }
+    }
+
+    private void displayAttachImageDialog() {
+        CharSequence[] items;
+        if (mImageToBeAttached != null)
+            items = new CharSequence[]{"Chụp ảnh", "Chọn ảnh", "Xóa ảnh"};
+        else
+            items = new CharSequence[]{"Chụp ảnh", "Chọn ảnh"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Ảnh đồ ăn");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (item == 0) {
+                    dispatchTakePhotoIntent();
+                } else if (item == 1) {
+                    dispatchChoosePhotoIntent();
+                } else {
+                    deleteCurrentPhoto();
+                }
+            }
+        });
+        builder.show();
+    }
+
+    private void dispatchChoosePhotoIntent() {
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Select File"), REQUEST_CHOOSE_PHOTO);
     }
 
     private File createImageFile() throws IOException {
