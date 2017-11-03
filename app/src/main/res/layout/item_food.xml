@@ -125,7 +125,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/iv_food"
-                android:layout_alignEnd="@+id/tv_totalRate"
+                android:layout_toEndOf="@+id/iv_avatar"
                 android:layout_marginBottom="14sp"
                 android:layout_marginLeft="8dp"
                 android:text="Minh Quan"

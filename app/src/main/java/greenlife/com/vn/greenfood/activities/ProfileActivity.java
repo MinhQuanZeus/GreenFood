@@ -232,7 +232,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(getApplicationContext(), FoodDetailActivity.class).putExtra("post",model);
+                        Intent intent = new Intent(getApplicationContext(), FoodDetailActivity.class).putExtra("post",model.getId());
                         Log.d("Detail","Des: "+model.getDescription());
                         startActivity(intent);
                     }

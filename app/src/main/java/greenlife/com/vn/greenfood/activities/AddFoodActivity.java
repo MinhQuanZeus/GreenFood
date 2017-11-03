@@ -218,7 +218,7 @@ public class AddFoodActivity extends AppCompatActivity {
                                 //  ivAddFoodImage.buildDrawingCache();
                                 //  Bitmap bitmap = ivAddFoodImage.getDrawingCache();
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                mImageToBeAttached.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                                mImageToBeAttached.compress(Bitmap.CompressFormat.JPEG, 75, baos);
                                 final byte[] data = baos.toByteArray();
                                 UploadTask uploadTask = mStorageReference.putBytes(data);
                                 progressDialog = new ProgressDialog(AddFoodActivity.this);

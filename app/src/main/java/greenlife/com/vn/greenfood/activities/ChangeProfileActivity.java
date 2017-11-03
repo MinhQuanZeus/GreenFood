@@ -352,8 +352,19 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_done:
-                String uID = mAuth.getCurrentUser().getUid();
-                updateInfor();
+                if(username.getText().toString().length()>100){
+                    Toast.makeText(this, "Tên của bạn quá dài",
+                            Toast.LENGTH_LONG).show();
+                    break;
+                }else if(description.getText().toString().length()>100){
+                    Toast.makeText(this, "Miêu tả nhỏ hơn 100 kí tự",
+                            Toast.LENGTH_LONG).show();
+                    break;
+                }
+                else {
+                    String uID = mAuth.getCurrentUser().getUid();
+                    updateInfor();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
