@@ -20,11 +20,12 @@ public class Order implements Serializable {
     private String time;
     private String status;
     private String postId;
+    private String phone;
 
     public Order() {
     }
 
-    public Order(String buyerID, String buyerName, String sellerID, String foodName, String foodImgLink, String type, String time, String status, String postId) {
+    public Order(String buyerID, String buyerName, String sellerID, String foodName, String foodImgLink, String type, String time, String status, String postId, String phone) {
         this.buyerID = buyerID;
         this.buyerName = buyerName;
         this.sellerID = sellerID;
@@ -34,6 +35,7 @@ public class Order implements Serializable {
         this.time = time;
         this.status = status;
         this.postId = postId;
+        this.phone = phone;
     }
 
     public Order(String buyerID, String sellerID, String foodName, String foodImgLink, String type, String time, String status) {
@@ -81,6 +83,10 @@ public class Order implements Serializable {
 
     public String getPostId() {
         return postId;
+    }
+
+    public String getPhone() {
+        return phone;
     }
 
     @Override

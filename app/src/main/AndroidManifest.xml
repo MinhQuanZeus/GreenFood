@@ -17,6 +17,7 @@
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.ln.androidgcm.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <uses-feature
         android:name="android.hardware.camera"

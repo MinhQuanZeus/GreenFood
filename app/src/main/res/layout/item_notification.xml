@@ -2,7 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="90dp"
     android:orientation="vertical">
 
         <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -21,8 +21,8 @@
 
                 <greenlife.com.vn.greenfood.utils.RoundImageView
                     android:id="@+id/iv_notification"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:scaleType="centerCrop" />
 
                 <TextView
@@ -38,7 +38,7 @@
 
                 <TextView
                     android:id="@+id/tv_description"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_below="@id/tv_title"
                     android:layout_gravity="fill"
@@ -51,6 +51,16 @@
                     android:textColor="@color/secondary_text"
                     android:textSize="16sp"
                     />
+                <Button
+                    android:id="@+id/btn_call"
+                    android:background="@color/primary"
+                    android:textColor="@color/white"
+                    android:layout_below="@id/tv_title"
+                    android:layout_alignParentEnd="true"
+                    android:text="Call now"
+                    android:clickable="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp" />
             </RelativeLayout>
         </android.support.v7.widget.CardView>
 

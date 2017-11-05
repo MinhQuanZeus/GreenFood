@@ -72,7 +72,7 @@ public class RecieveNotificationServices extends FirebaseMessagingService {
                 .getReference()
                 .child("users")
                 .child(order.getSellerID())
-                .child("history");
+                .child("orders");
         DatabaseReference newPost = mDatabaseReference.push();
         newPost.child("type").setValue("order");
         newPost.child("buyerID").setValue(order.getBuyerID());
@@ -81,6 +81,8 @@ public class RecieveNotificationServices extends FirebaseMessagingService {
         newPost.child("time").setValue(order.getTime());
         newPost.child("status").setValue("Unchecked");
         newPost.child("postId").setValue(order.getPostId());
+        newPost.child("phone").setValue(order.getPhone());
+        Log.d("Phone number", order.getPhone());
 
 
 

@@ -390,12 +390,14 @@ public class FoodDetailActivity extends AppCompatActivity {
         Log.d(TAG, "address ID : " + sellerUser.getTokenID());
         MapsUltils.getUser(this, firebaseAuth.getCurrentUser().getUid(), new GetUserFromIDListener() {
             @Override
-            public void getUserFromID(User user) {
+            public void getUserFromID(final User user) {
                 Order order = null;
-                Log.d(TAG, "token ID : " + user.getTokenID());
+                final String userPhone = user.getPhone();
+                Log.d(TAG, userPhone);
+                Log.d(TAG, "token ID : " + firebaseAuth.getCurrentUser().getUid());
                 final String now = LibrarySupportManager.getInstance().currentDateTime();
                 if(post != null){
-                    order = new Order(firebaseAuth.getCurrentUser().getUid(),buyer.getName(),post.getUserID(),post.getTitle(), post.getImage(),"order",now,"order",post.getId());
+                    order = new Order(firebaseAuth.getCurrentUser().getUid(),buyer.getName(),post.getUserID(),post.getTitle(), post.getImage(),"order",now,"order",post.getId(), user.getPhone());
                 }
 
                 Log.d(TAG, "my order : " + order.toString());
@@ -420,18 +422,20 @@ public class FoodDetailActivity extends AppCompatActivity {
                                         .getSuccess() != 0) {
                                     Log.d(TAG, "Success send");
                                     //create order list of buyer
-                                    mDatabaseReference = FirebaseDatabase.getInstance()
+                                   DatabaseReference mDatabaseReference = FirebaseDatabase.getInstance()
                                             .getReference()
                                             .child("users")
-                                            .child(firebaseAuth.getCurrentUser().getUid())
-                                            .child("history");
+                                            .child(post.getUserID())
+                                            .child("orders");
                                     DatabaseReference newPost = mDatabaseReference.push();
+                                    newPost.child("phone").setValue(userPhone);
                                     newPost.child("type").setValue("request");
                                     newPost.child("sellerID").setValue(post.getUserID());
                                     newPost.child("foodName").setValue(post.getTitle());
                                     newPost.child("time").setValue(now);
                                     newPost.child("foodImgLink").setValue(post.getImage());
                                     newPost.child("status").setValue("waiting");
+
                                 }
                                 Toast.makeText(FoodDetailActivity.this, "Bạn đã order thành công ", Toast.LENGTH_SHORT).show();
                             }

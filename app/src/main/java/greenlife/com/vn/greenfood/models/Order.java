@@ -24,6 +24,7 @@ public class Order implements Serializable {
     private String time;
     private String status;
     private String postId;
+    private String phone;
 
     public Order() {
     }

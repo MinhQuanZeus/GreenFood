@@ -364,6 +364,11 @@ public class ChangeProfileActivity extends AppCompatActivity implements View.OnC
                 else {
                     String uID = mAuth.getCurrentUser().getUid();
                     updateInfor();
+                    Toast.makeText(this, "Cập nhật thành công",
+                            Toast.LENGTH_LONG).show();
+                    if (updateInfor()){
+
+                    }
                 }
                 break;
         }

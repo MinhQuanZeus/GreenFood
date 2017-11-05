@@ -6,10 +6,14 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,8 +23,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,12 +51,17 @@ import greenlife.com.vn.greenfood.models.User;
 import greenlife.com.vn.greenfood.network.models.order.Order;
 import greenlife.com.vn.greenfood.utils.MapsUltils;
 
+import static android.Manifest.permission.CALL_PHONE;
+import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 /**
  * A simple {@link Fragment} subclass.
  */
 public class NotificationFragment extends Fragment {
 
     private static final String TAG = NotificationFragment.class.getSimpleName();
+    public static final int RequestPermissionCode = 1;
     private Toolbar toolbar;
     private RecyclerView recyclerView;
     private DatabaseReference databaseReference;
@@ -69,6 +80,9 @@ public class NotificationFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_notification, container, false);
         setupUI(view);
         loadData();
+        if(!checkPermission()){
+            requestPermission();
+        }
         return view;
     }
 
@@ -79,7 +93,7 @@ public class NotificationFragment extends Fragment {
                 .getReference()
                 .child("users")
                 .child(firebaseAuth.getCurrentUser().getUid())
-                .child("history");
+                .child("orders");
     }
 
     private void setupUI(View view) {
@@ -119,6 +133,12 @@ public class NotificationFragment extends Fragment {
                         startActivity(intent);
                     }
                 });
+                viewHolder.itemView.findViewById(R.id.btn_call).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onCallPhone(model.getPhone());
+                    }
+                });
 
             }
         };
@@ -130,6 +150,7 @@ public class NotificationFragment extends Fragment {
         private ImageView ivNotification;
         private TextView tvTitle;
         private TextView tvDescription;
+        private Button btnPhone;
 
         public NotificationViewHolder(View itemView) {
             super(itemView);
@@ -141,6 +162,7 @@ public class NotificationFragment extends Fragment {
             ivNotification = itemView.findViewById(R.id.iv_notification);
             tvTitle = itemView.findViewById(R.id.tv_title);
             tvDescription = itemView.findViewById(R.id.tv_description);
+            btnPhone = itemView.findViewById(R.id.btn_call);
         }
 
         private void loadData(Context context, final Order order){
@@ -151,7 +173,7 @@ public class NotificationFragment extends Fragment {
             if(order.getType().equals("order")){
                 MapsUltils.getUser(context, order.getBuyerID(), new GetUserFromIDListener() {
                     @Override
-                    public void getUserFromID(User user) {
+                    public void getUserFromID(final User user) {
                         tvTitle.setText(user.getName() + " order "  + " " + order.getFoodName());
                         tvDescription.setText(order.getTime());
                     }
@@ -169,10 +191,50 @@ public class NotificationFragment extends Fragment {
         }
     }
 
+    public void onCallPhone(String phone){
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        callIntent.setData(Uri.parse("tel:" + phone));
+        startActivity(callIntent);
+    }
+
     @Override
     public void onResume() {
         firebaseRecyclerAdapter.notifyDataSetChanged();
         super.onResume();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case RequestPermissionCode:
+                if (grantResults.length > 0) {
+                    boolean StoragePermission = grantResults[0] ==
+                            PackageManager.PERMISSION_GRANTED;
+                    boolean RecordPermission = grantResults[1] ==
+                            PackageManager.PERMISSION_GRANTED;
+
+                    if (StoragePermission && RecordPermission) {
+                        Toast.makeText(getActivity(), "Permission Granted",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(), "Permission Denied", Toast.LENGTH_LONG).show();
+                    }
+                }
+                break;
+        }
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(getActivity(), new
+                String[]{CALL_PHONE}, RequestPermissionCode);
+    }
+
+    public boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
+                CALL_PHONE);
+        return result == PackageManager.PERMISSION_GRANTED;
     }
 
 }
