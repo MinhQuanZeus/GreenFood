@@ -1,5 +1,6 @@
 package greenlife.com.vn.greenfood.activities;
 
+import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -85,6 +86,9 @@ public class FoodDetailActivity extends AppCompatActivity {
     private Button btnOrder;
     private TextView tvFoodName;
     private Button btn_rating;
+    private TextView txtPhoneSeller;
+    private Button btn_Call;
+    User userSeller ;
 
     private String distance;
 
@@ -132,6 +136,8 @@ public class FoodDetailActivity extends AppCompatActivity {
         ivFood = (ImageView) findViewById(R.id.iv_food);
         ratingBar = (RatingBar) findViewById(R.id.rating_bar);
         btn_rating = (Button) findViewById(R.id.btn_rating);
+        txtPhoneSeller = (TextView) findViewById(R.id.tv_phoneNumber);
+        btn_Call = (Button) findViewById(R.id.btn_phone) ;
 
         //for send order
         btnOrder = (Button) findViewById(R.id.btn_order);
@@ -180,6 +186,34 @@ public class FoodDetailActivity extends AppCompatActivity {
                     tvPrice.setText(formatNumber(post.getPrice()));
                     tvAddress.setText(post.getAddress());
                     ratingBar.setRating(post.getRateAvgRating());
+
+                    //xu ly get so dien thoai
+                    post.getUserID();
+
+                  //  mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+                    mDatabaseReference.child("users").child(post.getUserID()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                            userSeller = dataSnapshot.getValue(User.class);
+
+                           if(userSeller != null){
+                                if(!userSeller.getPhone().toString().isEmpty()){
+                                    txtPhoneSeller.setText(userSeller.getPhone().toString());
+                                }
+                           }
+
+
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
                 }
 
             }
@@ -298,8 +332,8 @@ public class FoodDetailActivity extends AppCompatActivity {
                 }
 
             }
-        });
-
+        })
+        ;
         // Handle Button rating
         btn_rating.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -315,6 +349,20 @@ public class FoodDetailActivity extends AppCompatActivity {
                     ratingBarFragment.show(fragmentManager, "dialog");
                 }
 
+            }
+        });
+
+        btn_Call.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (post.getUserID().compareToIgnoreCase(firebaseAuth.getCurrentUser().getUid()) == 0) {
+                    Toast.makeText(FoodDetailActivity.this, " Bạn không thể tự gọi chính mình ", Toast.LENGTH_SHORT).show();
+                } else {
+                    String phoneToCall ="0"+ txtPhoneSeller.getText().toString().trim().substring(3);
+                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                    intent.setData(Uri.parse("tel:"+ phoneToCall));
+                    startActivity(intent);
+                }
             }
         });
     }

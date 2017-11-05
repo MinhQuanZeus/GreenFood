@@ -7,7 +7,7 @@ public class User {
     private String phone;
     private String address;
     private String avatar;
-    private long rating;
+    private long rate;
     private String tokenID;
     private String description;
     private String link;
@@ -21,7 +21,7 @@ public class User {
         this.phone = phone;
         this.address = address;
         this.avatar = avatar;
-        this.rating = rating;
+        this.rate = rating;
         this.tokenID = tokenID;
         this.description = description;
         this.link = link;
@@ -48,7 +48,7 @@ public class User {
     }
 
     public long getRating() {
-        return rating;
+        return rate;
     }
 
     public String getTokenID() {
